@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 本篇文章主要介绍了如何用Dom4j+Xpath解析XML文件XML的解析在Java的框架源码中十分常用，因此学会解析XML文件是必要的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java中XML文件的解析（Dom4j+Xpath）">
+<meta property="og:url" content="http://yoursite.com/2019/08/27/Java%E4%B8%ADXML%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%EF%BC%88Dom4j-Xpath%EF%BC%89/index.html">
+<meta property="og:site_name" content="MemoForward&#39;s Blog">
+<meta property="og:description" content="前言 本篇文章主要介绍了如何用Dom4j+Xpath解析XML文件XML的解析在Java的框架源码中十分常用，因此学会解析XML文件是必要的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-27T13:03:56.000Z">
+<meta property="article:modified_time" content="2020-03-03T14:31:28.856Z">
+<meta property="article:author" content="MemoForward">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/08/27/Java%E4%B8%ADXML%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%EF%BC%88Dom4j-Xpath%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>Java中XML文件的解析（Dom4j+Xpath） | MemoForward's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="MemoForward's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MemoForward's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">阿星的学习笔记</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/MemoForward" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/27/Java%E4%B8%ADXML%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%EF%BC%88Dom4j-Xpath%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/personal.jpg">
+      <meta itemprop="name" content="MemoForward">
+      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MemoForward's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java中XML文件的解析（Dom4j+Xpath）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-27 21:03:56" itemprop="dateCreated datePublished" datetime="2019-08-27T21:03:56+08:00">2019-08-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-03 22:31:28" itemprop="dateModified" datetime="2020-03-03T22:31:28+08:00">2020-03-03</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>本篇文章主要介绍了如何用Dom4j+Xpath解析XML文件<br>XML的解析在Java的框架源码中十分常用，因此学会解析XML文件是必要的</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="XML文件"><a href="#XML文件" class="headerlink" title="XML文件"></a>XML文件</h1><p>·　　XML文件是一种可扩展标记语言。做后台开发接触到的XML文件一般是以配置文件的身份登场，虽说现在几乎不用我们自行解析XML配置文件，但是技多不压身，万一哪天我们需要自己开发框架了，这门技能就成为了必须。</p>
+<h2 id="XML文件格式"><a href="#XML文件格式" class="headerlink" title="XML文件格式"></a>XML文件格式</h2><p>·　　XML文件的格式非常简单，第一行是文件声明，后面就是我们自行添加的内容。书写XML文件有几点注意事项：</p>
+<ul>
+<li>必须有声明</li>
+<li>标签区分大小写</li>
+<li>只有一个根元素（根标签）</li>
+<li>属性可以自定义，属性值必须添加引号</li>
+<li>必须有结束标志(&lt;/&gt;)</li>
+</ul>
+<p>·示例如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span> <span class="comment">&lt;!-- 声明 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span>&gt;</span><span class="comment">&lt;!-- 自定义根元素，有且仅有一个 --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"studentService"</span> <span class="attr">class</span>=<span class="string">"com.memoforward.service.StudentService"</span>&gt;</span> <span class="comment">&lt;!-- 自定义子元素，自定义属性名和属性值--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"studentDao"</span> <span class="attr">ref</span>=<span class="string">"studentDao"</span>/&gt;</span> <span class="comment">&lt;!-- 子元素下依然可以有子元素，xml可以无限层--&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">bean</span>&gt;</span><span class="comment">&lt;!--结束标志--&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"studentDao"</span> <span class="attr">class</span>=<span class="string">"com.memoforward.dao.StudentDao"</span>/&gt;</span> <span class="comment">&lt;!-- 结束标志的另一种写法--&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">beanTest</span> &gt;</span>beanTestValue<span class="tag">&lt;/<span class="name">beanTest</span>&gt;</span><span class="comment">&lt;!--一般情况下，xml标签是有标签值的--&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="DOM"><a href="#DOM" class="headerlink" title="DOM"></a>DOM</h2><p>·　　由上面的格式可知，其实XML与HTML相差并不大，我们访问和操作HTML文档使用的工具是HTML DOM 树。异曲同工，Dom4j也参照了这种方法，其使用SAXReader对象将整个XML文档读取，构建出了document树对象。通过这个树对象，配合上XPath工具，我们就可以很轻松地访问到整个文件的所有节点的数据了，其中节点（元素）就是Element对象，节点中的属性就是Atrribute对象。<br>·　　所以，解析XML的步骤就是：<strong>创建SAXReader对象 — SAXReader获取XML文件的Document树对象 — document树获取Element元素对象 — Element元素对象获取其元素的属性Attribute对象</strong>。这一套流程下来，基本想读取什么值都可以。</p>
+<h1 id="解析XML文件"><a href="#解析XML文件" class="headerlink" title="解析XML文件"></a>解析XML文件</h1><p>·　　本博客使用Dom4j+Xpath来解释XML文件。使用这种方式需要引入两个jar包，一个是dom4j包，另一个是Xpath通用引擎包jaxen。注：如果xml文件不大，推荐使用此种方式解析xml文件（因为使用简单方便）；如果XML巨大，可以使用JDK自带的SAX解析器去“边读边写”提高效率，但因为其操作比较复杂，需要定义自己的处理器，本博客就不描述此种方法了。<br>其Maven依赖如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- https://mvnrepository.com/artifact/dom4j/dom4j --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>dom4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>dom4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.6.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- https://mvnrepository.com/artifact/jaxen/jaxen --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>jaxen<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jaxen<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="Xpath"><a href="#Xpath" class="headerlink" title="Xpath"></a>Xpath</h2><p>·　　在正式开始解析之前，不得不介绍一下Xpath是为何物。<br>·　　XPath 是一门在 XML 文档中查找信息的语言，用于在 XML 文档中对元素和属性进行遍历。XPath 使用<strong>路径表达式</strong>来选取 XML 文档中的节点或者节点集。这些路径表达式和我们在常规的电脑文件系统中看到的表达式非常相似。<br>·　　由上述概念可知，我们解析XML文件的核心就在于：<strong>使用XPath的路径表达式在document树对象中检索节点。</strong><br>·　　树对象的获取在1.2节已经介绍了，非常简单，因此难点就在于路径表达式的语法了。</p>
+<h3 id="路径表达式语法"><a href="#路径表达式语法" class="headerlink" title="路径表达式语法"></a>路径表达式语法</h3><p>·　　Xpath是W3C的一个标准，因此W3School的在线教程网站上就有，传送门如下：<a href="https://www.w3school.com.cn/xpath/xpath_syntax.asp" target="_blank" rel="noopener">W3CXpath语法</a><br>·<strong>最有用的路径表达式如下</strong>：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>描述</th>
+<th>使用(依据上图的示例)</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nodename</td>
+<td>选取此节点下所有的子节点</td>
+<td>beans</td>
+<td>表示beans元素下所有的子节点</td>
+</tr>
+<tr>
+<td>/</td>
+<td>表示从根节点开始选取</td>
+<td>/beans/bean</td>
+<td>表示从根节点开始找到所有beans下所有名为bean的子节点</td>
+</tr>
+<tr>
+<td>//</td>
+<td>不管节点在什么位置，选取该节点</td>
+<td>//property</td>
+<td>表示选取property节点，不管它在什么位置</td>
+</tr>
+<tr>
+<td>.</td>
+<td>选取当前节点</td>
+<td>/</td>
+<td>/</td>
+</tr>
+<tr>
+<td>..</td>
+<td>选取当前节点的父节点</td>
+<td>/</td>
+<td>/</td>
+</tr>
+<tr>
+<td>@</td>
+<td>选取属性</td>
+<td>一般用于谓语中</td>
+<td>/</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>·<strong>谓语</strong><br>·　　谓语用来查找某个特定的节点或者包含某个指定的值的节点。谓语被嵌在方括号中。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>路径表达式</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/beans/bean[1]</td>
+<td>选取beans子元素下的第一个bean元素</td>
+</tr>
+<tr>
+<td>/beans/bean[@id=”studentDao”]</td>
+<td>选取beans子元素下的属性值为studentDao的bean元素</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="解析XML文件实例"><a href="#解析XML文件实例" class="headerlink" title="解析XML文件实例"></a>解析XML文件实例</h2><ul>
+<li>首先获取SAXReader对象，此对象在dom4j包中：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SAXReader saxReader = <span class="keyword">new</span> SAXReader();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>再从这个对象获取XML文件的document树对象：使用<strong>saxReader.read(…)</strong>；此函数可以传入两个对象，如下：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Document document = saxReader.read(File io);</span><br><span class="line">Document document = saxReader.read(InputStream in);</span><br></pre></td></tr></table></figure>
+<p>·　　这个两个入参具体使用哪一个看个人喜好，我本人比较喜欢传入InputStream，因为传入File对象需要给出文件相对项目的路径或者绝对路径，不太方便移植。而文件流可以直接从类加载器中获得，只需要保证项目在类路径下即可。</p>
+<ul>
+<li>获取文件流代码</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">XMLTest</span></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> InputStream in;</span><br><span class="line">    	<span class="keyword">static</span>&#123;</span><br><span class="line">       		in = XMLTest.class.getClassLoader().getResourceAsStream("beans.xml");</span><br><span class="line">    	&#125;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">testDom4j</span><span class="params">()</span></span>&#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>解析需求如下：</li>
+</ul>
+<blockquote>
+<ol>
+<li>获取所有的Bean标签，并获得其下面所有class属性值</li>
+<li>获取id=studentSerivce的bean元素，并获得property的ref属性</li>
+<li>得到beanTest元素的值</li>
+</ol>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">	<span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">TestDom4j</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        SAXReader saxReader = <span class="keyword">new</span> SAXReader();</span><br><span class="line">        Document document = saxReader.read(in);</span><br><span class="line">        <span class="comment">//1.获得bean标签，并得到他们class的属性值</span></span><br><span class="line">        ArrayList&lt;String&gt; beans = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="comment">//找到beans元素下的bean的节点</span></span><br><span class="line">        <span class="comment">//List里面的元素应该是Node，但是Element对象继承了Node，因此可以强制转换</span></span><br><span class="line">        List&lt;Element&gt; beanList = document.selectNodes(<span class="string">"/beans/bean"</span>);</span><br><span class="line">        <span class="keyword">for</span>(Element bean:beanList)&#123;</span><br><span class="line">            beans.add(bean.attributeValue(<span class="string">"class"</span>));</span><br><span class="line">            <span class="comment">//获取class属性值的第二种写法</span></span><br><span class="line"><span class="comment">//            Attribute attr = bean.attribute("class");</span></span><br><span class="line"><span class="comment">//            beans.add(attr.getStringValue());</span></span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"bean中的class属性值为："</span> + beans);</span><br><span class="line">        <span class="comment">//2.获取id=studentService的bean元素,并获得其下元素property的属性name值为studentDao的属性ref的值</span></span><br><span class="line">        <span class="comment">//Node对象强制转化成Element</span></span><br><span class="line">        Element p01 = (Element)document.selectSingleNode(<span class="string">"/beans/bean[@id='studentService']/property[@name='studentDao']"</span>);</span><br><span class="line">        System.out.println(<span class="string">"property属性ref的值："</span> + p01.attributeValue(<span class="string">"ref"</span>));</span><br><span class="line">        <span class="comment">//3.得到beanTest元素的值</span></span><br><span class="line">        Element beanTest = (Element) document.selectSingleNode(<span class="string">"/beans/beanTest"</span>);</span><br><span class="line">        System.out.println(<span class="string">"beanTest的值"</span> + beanTest.getStringValue());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>测试结果如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[TestNG] Running:</span><br><span class="line">  C:\Users\handsomestar\.IntelliJIdea2019.1\system\temp-testng-customsuite.xml</span><br><span class="line">bean中的class属性值为：[com.memoforward.service.StudentService, com.memoforward.dao.StudentDao]</span><br><span class="line">property属性ref的值：studentDao</span><br><span class="line">beanTest的值beanTestValue</span><br><span class="line"></span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br><span class="line">Default Suite</span><br><span class="line">Total tests run: 1, Failures: 0, Skips: 0</span><br><span class="line">&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>·　　解析XML文件还是相当简单的，其实就是一个树的读取，很快就能上手。</p>
+<h1 id="交流"><a href="#交流" class="headerlink" title="交流"></a>交流</h1><blockquote>
+<p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>MemoForward
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2019/08/27/Java%E4%B8%ADXML%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%EF%BC%88Dom4j-Xpath%EF%BC%89/" title="Java中XML文件的解析（Dom4j+Xpath）">http://yoursite.com/2019/08/27/Java中XML文件的解析（Dom4j-Xpath）/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/25/Java%E6%B3%A8%E8%A7%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E5%92%8C%E6%A1%88%E4%BE%8B%E4%BD%BF%E7%94%A8/" rel="prev" title="Java注解学习笔记和案例使用">
+      <i class="fa fa-chevron-left"></i> Java注解学习笔记和案例使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/28/slf4j-log4j2%E4%BD%BF%E7%94%A8%E5%8F%8Alog4j2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90/" rel="next" title="slf4j+log4j2使用及log4j2配置文件解析">
+      slf4j+log4j2使用及log4j2配置文件解析 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XML文件"><span class="nav-number">2.</span> <span class="nav-text">XML文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#XML文件格式"><span class="nav-number">2.1.</span> <span class="nav-text">XML文件格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DOM"><span class="nav-number">2.2.</span> <span class="nav-text">DOM</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解析XML文件"><span class="nav-number">3.</span> <span class="nav-text">解析XML文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Xpath"><span class="nav-number">3.1.</span> <span class="nav-text">Xpath</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#路径表达式语法"><span class="nav-number">3.1.1.</span> <span class="nav-text">路径表达式语法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解析XML文件实例"><span class="nav-number">3.2.</span> <span class="nav-text">解析XML文件实例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交流"><span class="nav-number">5.</span> <span class="nav-text">交流</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MemoForward"
+      src="/images/personal.jpg">
+  <p class="site-author-name" itemprop="name">MemoForward</p>
+  <div class="site-description" itemprop="description">一个温柔又专情的闷骚之人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MemoForward" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MemoForward" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/qq_34294121" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_34294121" rel="noopener" target="_blank"><i class="fa fa-fw fa-crosshairs"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/chenxingyu@bupt.edu.cn" title="E-Mail → chenxingyu@bupt.edu.cn"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/memoforward" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;memoforward" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MemoForward</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='137' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      script.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '4a4e80d6432798f5c023',
+      clientSecret: 'ef38d73f2ebc13d42df25af78048c374729dceed',
+      repo        : 'memoforward.github.io',
+      owner       : 'MemoForward',
+      admin       : ['MemoForward'],
+      id          : '5183b9299141e4231470186a788ff3b3',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>

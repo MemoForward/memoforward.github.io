@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 &amp;#160; &amp;#160; &amp;#160; &amp;#160;用了小半年的时间摸索了一下Java后端，最近在学框架的时候觉得之前学习的内容有所遗忘，因此想自己做一个特别简单但是功能还算齐全的学生管理系统，给自己加深一下对servlet的理解。本人平时用Eclipse比较多，为了熟悉一下其他的IDE，这次的项目就用IDEA开发了。笔者也是一个初学者，理解不到位的地方还请各位朋友指出。本项目不使用web">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学生管理系统（JSP+Servlet+MySQL）">
+<meta property="og:url" content="http://yoursite.com/2019/08/13/%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F(JSP-Servlet-MySQL)/index.html">
+<meta property="og:site_name" content="MemoForward&#39;s Blog">
+<meta property="og:description" content="前言 &amp;#160; &amp;#160; &amp;#160; &amp;#160;用了小半年的时间摸索了一下Java后端，最近在学框架的时候觉得之前学习的内容有所遗忘，因此想自己做一个特别简单但是功能还算齐全的学生管理系统，给自己加深一下对servlet的理解。本人平时用Eclipse比较多，为了熟悉一下其他的IDE，这次的项目就用IDEA开发了。笔者也是一个初学者，理解不到位的地方还请各位朋友指出。本项目不使用web">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190812193517122.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190812193648730.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190812201226637.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190812205400910.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190812215823201.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2019-08-13T03:39:06.000Z">
+<meta property="article:modified_time" content="2019-12-09T09:39:56.000Z">
+<meta property="article:author" content="MemoForward">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Project">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190812193517122.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yoursite.com/2019/08/13/%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F(JSP-Servlet-MySQL)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>学生管理系统（JSP+Servlet+MySQL） | MemoForward's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="MemoForward's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MemoForward's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">阿星的学习笔记</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/MemoForward" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/13/%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F(JSP-Servlet-MySQL)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/personal.jpg">
+      <meta itemprop="name" content="MemoForward">
+      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MemoForward's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          学生管理系统（JSP+Servlet+MySQL）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-13 11:39:06" itemprop="dateCreated datePublished" datetime="2019-08-13T11:39:06+08:00">2019-08-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-09 17:39:56" itemprop="dateModified" datetime="2019-12-09T17:39:56+08:00">2019-12-09</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>&#160; &#160; &#160; &#160;用了小半年的时间摸索了一下Java后端，最近在学框架的时候觉得之前学习的内容有所遗忘，因此想自己做一个特别简单但是功能还算齐全的学生管理系统，给自己加深一下对servlet的理解。本人平时用Eclipse比较多，为了熟悉一下其他的IDE，这次的项目就用IDEA开发了。笔者也是一个初学者，理解不到位的地方还请各位朋友指出。本项目不使用web.xml手动添加servlet和filter，均采用注解的方式添加，需要创建web3.0及以上的工程。</p>
+</blockquote>
+<a id="more"></a>
+<p><strong>github传送门</strong>  ：<a href="https://github.com/MemoForward/StudentManagement" target="_blank" rel="noopener">https://github.com/MemoForward/StudentManagement</a> </p>
+<h1 id="项目功能"><a href="#项目功能" class="headerlink" title="项目功能"></a>项目功能</h1><ul>
+<li>实现对学生列表的增删改查</li>
+</ul>
+<h1 id="运用知识"><a href="#运用知识" class="headerlink" title="运用知识"></a>运用知识</h1><ul>
+<li>mysql数据库增删改查语句（单表）</li>
+<li>c3p0数据库连接池(c3p0-config.xml)</li>
+<li>使用dbutils简化操作（QueryRunner）</li>
+<li>使用BeanUtils封装数据(BeanUtils.populate(…))</li>
+<li>MVC设计模式</li>
+<li>servlet的使用</li>
+<li>过滤器的使用(涉及一点点)</li>
+<li>反射</li>
+</ul>
+<h1 id="前期准备工作"><a href="#前期准备工作" class="headerlink" title="前期准备工作"></a>前期准备工作</h1><p>&#160; &#160; &#160; &#160;工欲善其事，必先利其器。每个人都要以一名项目经理的角度要求自己，做项目之前先把框架搭好了：导入必要的环境配置以及构建好项目的架构。</p>
+<h2 id="导入jar包"><a href="#导入jar包" class="headerlink" title="导入jar包"></a>导入jar包</h2><p>&#160; &#160; &#160; &#160;寻找jar包一直是最令人头疼的事情，所有还是推荐大家能尽快学习Maven，这次因为是最基础的Web工程，因此我就手动导入了，这里给出Maven的中心仓库，所有的jar包都可以在里面下载：<a href="http://mvnrepository.com" target="_blank" rel="noopener">http://mvnrepository.com</a>（千万别去CSDN上用积分下载，大部分在CSDN上用钱买的资源都是免费的），笔者用的jar都比较老旧，读者可以自行下载新版。所有的包都应放在项目web文件夹下的 WEB-INF/lib 中。</p>
+<blockquote>
+<p>c3p0-0.9.2-pre5.jar<br>commons-beanutils-1.8.3.jar<br>mysql-connector-java-5.1.39-bin.jar<br>commons-dbutils-1.4.jar<br>mchange-commons-java-0.2.3.jar // c3p0在0.9.2版本后会多出来一个辅助包<br>jstl.jar<br>standard.jar  // 使用jstl标签需要用到的包<br>commons-logging-1.1.1.jar </p>
+</blockquote>
+<h2 id="创建包"><a href="#创建包" class="headerlink" title="创建包"></a>创建包</h2><p>&#160; &#160; &#160; &#160;MVC：Model，View，Controller 分别代表Web工程中的三层结构。Model相当于持久层，主要用于与数据库交互，处理一些业务逻辑；View相当于展现层（WEB层），用于展现数据；Controller相当于控制层，用于处理Web层的数据并提供给持久层。<br>&#160; &#160; &#160; &#160;基于MVC架构，我们的项目也应该分成一个个的小的组件，而Web层都是jsp界面，因此在这里我们应该针对持久层和控制层建相应的包（src目录下）：</p>
+<h3 id="持久层"><a href="#持久层" class="headerlink" title="持久层"></a>持久层</h3><pre><code>- dao（实现与数据库的交互 Data Access Object）
+- service（实现业务逻辑）
+- domain（存放Bean的包）
+</code></pre><h3 id="控制层（统一放在web包下）"><a href="#控制层（统一放在web包下）" class="headerlink" title="控制层（统一放在web包下）"></a>控制层（统一放在web包下）</h3><pre><code>- servlet
+- base（本项目使用了反射原理强化了普通servlet）
+- filter （过滤器）
+</code></pre><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><pre><code>- utils（工具包）
+</code></pre><h2 id="创建配置文件"><a href="#创建配置文件" class="headerlink" title="创建配置文件"></a>创建配置文件</h2><p>&#160; &#160; &#160; &#160;主要需要两个配置文件：log4j.properties 和 c3p0-config.xml。分别是使用log4j和c3p0的依赖。这两个配置文件都应该放置在类路径下（src/）</p>
+<h3 id="log4j-properties"><a href="#log4j-properties" class="headerlink" title="log4j.properties"></a>log4j.properties</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#参考资料：http:&#x2F;&#x2F;www.blogjava.net&#x2F;zJun&#x2F;archive&#x2F;2006&#x2F;06&#x2F;28&#x2F;55511.html</span><br><span class="line">log4j.rootLogger&#x3D;debug,stdout,D</span><br><span class="line">log4j.appender.stdout&#x3D;org.apache.log4j.ConsoleAppender</span><br><span class="line">log4j.appender.stdout.Target&#x3D;System.out</span><br><span class="line">log4j.appender.stdout.layout&#x3D;org.apache.log4j.PatternLayout</span><br><span class="line">log4j.appender.stdout.layout.ConversionPattern&#x3D;%d&#123;ABSOLUTE&#125; %5p %c&#123;1&#125;:%L - %m%n</span><br><span class="line">#log4j.appender.D&#x3D;org.apache.log4j.DailyRollingFileAppender</span><br><span class="line">##log4j.appender.D.File&#x3D;填写</span><br><span class="line">#log4j.appender.D.Append&#x3D;true</span><br><span class="line">#log4j.appender.D.Threshold&#x3D;DEBUG</span><br><span class="line">#log4j.appender.D.layout&#x3D;org.apache.log4j.PatternLayout</span><br><span class="line">#log4j.appender.D.layout.ConversionPattern&#x3D;%d&#123;[yyyy&#x2F;MM&#x2F;dd HH:mm:ss,SSS]&#125; [%5p] [%c:%L] - %m%n</span><br><span class="line">#log4j.appender.D&#x3D;org.apache.log4j.DailyRollingFileAppender</span><br><span class="line">##log4j.appender.D.File&#x3D;填写</span><br><span class="line">#log4j.appender.D.Append&#x3D;true</span><br><span class="line">#log4j.appender.D.Threshold&#x3D;ERROR</span><br><span class="line">#log4j.appender.D.layout&#x3D;org.apache.log4j.PatternLayout</span><br><span class="line">#log4j.appender.D.layout.ConversionPattern&#x3D;%d&#123;[yyyy&#x2F;MM&#x2F;dd HH:mm:ss,SSS]&#125; [%5p] [%c:%L] - %m%n</span><br></pre></td></tr></table></figure>
+<h3 id="c3p0-config-xml-最好不要修改名字"><a href="#c3p0-config-xml-最好不要修改名字" class="headerlink" title="c3p0-config.xml(最好不要修改名字)"></a>c3p0-config.xml(最好不要修改名字)</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version='1.0' encoding='UTF-8'?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">c3p0-config</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">default-config</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"driverClass"</span>&gt;</span>com.mysql.jdbc.Driver<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"jdbcUrl"</span>&gt;</span>jdbc:mysql://localhost:3306/数据库名<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span>&gt;</span>root<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span>密码<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        连接池用完后等待，超时则抛异常--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"checkoutTimeout"</span>&gt;</span>30000<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        每30秒检测连接池中的空闲连接--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"idleConnectionTestPeriod"</span>&gt;</span>30<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        初始化连接个数--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"initialPoolSize"</span>&gt;</span>10<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        最大空闲时间，大于30秒则释放连接--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"maxIdleTime"</span>&gt;</span>30<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"maxPoolSize"</span>&gt;</span>50<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"minPoolSize"</span>&gt;</span>10<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        预缓存语句总计不超过200条--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"maxStatements"</span>&gt;</span>200<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"destroy-method"</span>&gt;</span>close<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">default-config</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">c3p0-config</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h1><p>&#160; &#160; &#160; &#160; 本项目只用到了一个表，所以非常的简单，学生表的字段只有6个，分别是：id（主键），学号，姓名，性别，年龄，生日。这里给出创建表的sql语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#96;stu&#96;DROP DATABASE IF EXISTS student_00;</span><br><span class="line">CREATE DATABASE student_00 DEFAULT CHARACTER SET utf8;</span><br><span class="line"></span><br><span class="line">USE student_00;</span><br><span class="line"></span><br><span class="line">CREATE&#96;stu&#96; TABLE stu(</span><br><span class="line">	sid VARCHAR(255) NOT NULL PRIMARY KEY,</span><br><span class="line">	snum INT(10),</span><br><span class="line">	sname VARCHAR(255),</span><br><span class="line">	sage INT(10),</span><br><span class="line">	sgender VARCHAR(20),</span><br><span class="line">	birthday DATE DEFAULT NULL</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h1 id="美工"><a href="#美工" class="headerlink" title="美工"></a>美工</h1><p>&#160; &#160; &#160; &#160;  在写代码之前，笔者比较喜欢先把界面做出一个雏形，这样调试起来比较直观。但是笔者的前端技术非常之差，接触代码也不过一年的时间，所以没有时间学，这次的界面做的比较糟糕，各种bootstrap的组件乱贴，代码估计也会有很多的冗余，这里只给出图片，具体的内容各位如果有兴趣可以去git上下载源码。各位朋友如果实在看不下去，笔者也十分渴望和各位多多交流。所有的资源都应放在项目的web文件夹下。（忽略年龄和出生日期不匹配的问题…）</p>
+<h2 id="主界面"><a href="#主界面" class="headerlink" title="主界面"></a>主界面</h2><p><img src="https://img-blog.csdnimg.cn/20190812193517122.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70" alt="展示主界面"></p>
+<h2 id="编辑学生和添加学生界面"><a href="#编辑学生和添加学生界面" class="headerlink" title="编辑学生和添加学生界面"></a>编辑学生和添加学生界面</h2><p><img src="https://img-blog.csdnimg.cn/20190812193648730.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70" alt="编辑学生"></p>
+<h1 id="书写代码"><a href="#书写代码" class="headerlink" title="书写代码"></a>书写代码</h1><p>&#160; &#160; &#160; &#160;  这一部分的代码量还是挺多的，各位如果有兴趣可以去git上下载源码。这里主要介绍一下（JSP+Servlet+MySQL）的流程，其实网上优秀的教程还是很多的，各位不嫌弃的话在这里稍微看一下也无妨。除了基本的概念外，笔者还将介绍一下如何增强Servlet和实现过滤的操作，以及自己编写的工具类的介绍。</p>
+<h2 id="Jsp-Servlet-MySQL"><a href="#Jsp-Servlet-MySQL" class="headerlink" title="Jsp+Servlet+MySQL"></a>Jsp+Servlet+MySQL</h2><p>&#160; &#160; &#160; &#160;  最典型的MVC设计模式莫过于Jsp+Servlet+JavaBean：Jsp负责传递用户的输入以及显示用户需要的数据；Servlet用来处理从Jsp界面中传递过来的请求（获取到用户输入的数据），将数据进行业务逻辑处理后，将需要展示的数据封装到域对象（一般是request，session）中；而Servlet处理数据的操作主要是通过JavaBean来与数据库进行对话。因此，可以很清晰的看到，Servlet在数据的交互的过程中，起到了一个中间层的控制作用。如下图所示，一般情况下，每一个不一样的Jsp的请求我们就需要去创建一个Servlet类去处理（这里注意一下本项目中Servlet是<strong>单例多线程</strong>的，因此会有线程安全的问题），所以我们需要去创建很多的Servlet类去实现功能。<br><img src="https://img-blog.csdnimg.cn/20190812201226637.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70" alt="JSP+Servlet+MySQL流程"><br>&#160; &#160; &#160; &#160;  这里必须说明一下Service和DAO的区别。Serive和DAO里面的内容都是业务逻辑，比如：查找某个学生，修改某个学生信息等。但是DAO层我们往往只关心单层逻辑，而在Service层中我们可以实现多层逻辑。这里举个比较直观的例子：<strong>在本项目中实现了分页的功能，我们抽取的页面Bean（PageBean：可以理解为一个页面往往不会只包含了学生的个人信息，因此需要将页面的模型抽取出来）中包含两个变量:一个是数据库中总的学生数量，一个是本页（可见上图的主界面）中包含的学生信息。我们在Servlet中希望得到的数据是一个包含这两个变量数据的PageBean，而获取PageBean中两个变量的操作对应了两条sql语句：</strong><code>select count(*) from stu</code><strong>和</strong><code>select * from stu limit ?,?</code><strong>这两条语句其实就是两个业务逻辑，对应两个DAO层的方法，而Service的作用就是组装这两个逻辑，实现多层的逻辑，即获取到整个页面的数据。</strong> 因为本项目过于简单，所以这两层其实也没有必要细分，不过以后一定会遇到更为复杂的项目的，所以还是建议各位养成良好的习惯。<br>&#160; &#160; &#160; &#160;  这里笔者还是稍加笔墨用一个简单的示例展现一下这个流程在本项目中的应用，如果用户想要<strong>删除学生</strong>:<br><img src="https://img-blog.csdnimg.cn/20190812205400910.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70" alt="删除学生流程"></p>
+<h2 id="增强Servlet"><a href="#增强Servlet" class="headerlink" title="增强Servlet"></a>增强Servlet</h2><p>&#160; &#160; &#160; &#160; 上一小节我们介绍了一下Jsp+Servlet+MySQL的流程，这种流程还是非常简单易懂的，但是有一个特别不方便的地方在于，每一个来自页面的请求，我们往往都需要一个Servlet类去满足这个请求，这其实是不符合我们的生活习惯的，试想一下：如果存钱和取钱对应不同的ATM机，估计我们会被搞疯掉。我们更希望面对的情况是：一台ATM机会处理来自所有关于存款的操作。也就是说，我们希望用一个关于学生的StudentServlet去满足所有针对情况的请求，不同的请求对应不同的方法。而<strong>servlet的生命周期</strong>是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- init() &#x2F;&#x2F;第一次创建 Servlet 时被调用,后续的请求不再调用</span><br><span class="line">- service(ServletRequest request, ServletResponse response) &#x2F;&#x2F;Servlet处理客户端请求所调用的方法</span><br><span class="line">		- 在Service下有我们常见的doGet和doPost方法</span><br><span class="line"> - destory() &#x2F;&#x2F;只会被调用一次，在 Servlet 生命周期结束时被调用</span><br><span class="line"> - 被垃圾回收</span><br></pre></td></tr></table></figure>
+<p>&#160; &#160; &#160; &#160; 可以看到，servlet最核心的部分就是service()方法，我们自己创建的Servlet都是要继承HttpServlet类，如果有阅读源码习惯的小伙伴可以看一下这个类中实现d的service()方法，这个方法会分析界面的请求类型，自动调用doGet和doPost方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        String method = req.getMethod(); <span class="comment">//在这里取界面出传递过来的方法，一般就是GET或者POST</span></span><br><span class="line">        <span class="keyword">long</span> lastModified;</span><br><span class="line">        <span class="keyword">if</span> (method.equals(<span class="string">"GET"</span>)) &#123;</span><br><span class="line">            lastModified = <span class="keyword">this</span>.getLastModified(req);</span><br><span class="line">            <span class="keyword">if</span> (lastModified == -<span class="number">1L</span>) &#123;</span><br><span class="line">                <span class="keyword">this</span>.doGet(req, resp); </span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">long</span> ifModifiedSince;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    ifModifiedSince = req.getDateHeader(<span class="string">"If-Modified-Since"</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IllegalArgumentException var9) &#123;</span><br><span class="line">                    ifModifiedSince = -<span class="number">1L</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (ifModifiedSince &lt; lastModified / <span class="number">1000L</span> * <span class="number">1000L</span>) &#123;</span><br><span class="line">                    <span class="keyword">this</span>.maybeSetLastModified(resp, lastModified);</span><br><span class="line">                    <span class="keyword">this</span>.doGet(req, resp);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    resp.setStatus(<span class="number">304</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(<span class="string">"HEAD"</span>)) &#123;</span><br><span class="line">            lastModified = <span class="keyword">this</span>.getLastModified(req);</span><br><span class="line">            <span class="keyword">this</span>.maybeSetLastModified(resp, lastModified);</span><br><span class="line">            <span class="keyword">this</span>.doHead(req, resp);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(<span class="string">"POST"</span>)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.doPost(req, resp);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(<span class="string">"PUT"</span>)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.doPut(req, resp);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(<span class="string">"DELETE"</span>)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.doDelete(req, resp);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(<span class="string">"OPTIONS"</span>)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.doOptions(req, resp);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.equals(<span class="string">"TRACE"</span>)) &#123;</span><br><span class="line">            <span class="keyword">this</span>.doTrace(req, resp);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            String errMsg = lStrings.getString(<span class="string">"http.method_not_implemented"</span>);</span><br><span class="line">            Object[] errArgs = <span class="keyword">new</span> Object[]&#123;method&#125;;</span><br><span class="line">            errMsg = MessageFormat.format(errMsg, errArgs);</span><br><span class="line">            resp.sendError(<span class="number">501</span>, errMsg);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>&#160; &#160; &#160; &#160;而我们去实现自己的子类Servlet的时候，就是在重写doGet方法，笔者在这里因为篇幅原因不加赘述。但是如果要实现我们的目标应该怎么做呢？<strong>由HttpServlet类中的service()方法得到启发：我们应该直接从界面传递要执行的Servlet请求方法，在service()方法中得到请求的方法名，从而直接利用反射调用子类的方法。因此我们需要重写service()方法，所以笔者建立了Base包来创造一个BaseServlet来重新实现service()方法</strong>。话不多说，上代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseServlet</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        String method = req.getParameter(<span class="string">"method"</span>); <span class="comment">//客户端的请求应包含mehod的键来传递方法名</span></span><br><span class="line">        <span class="comment">//如果没有method键，则调用默认方法</span></span><br><span class="line">        <span class="keyword">if</span>(method == <span class="keyword">null</span> || method.equals(<span class="string">""</span>))&#123;</span><br><span class="line">            method = <span class="string">"excute"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果子类继承了这个类，则会创建子类的servlet，使用this会得到子类的类字节码</span></span><br><span class="line">        Class clazz = <span class="keyword">this</span>.getClass();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Method md = clazz.getMethod(method,HttpServletRequest<span class="class">.<span class="keyword">class</span>, <span class="title">HttpServletResponse</span>.<span class="title">class</span>)</span>;</span><br><span class="line">            <span class="keyword">if</span>(md != <span class="keyword">null</span>)&#123;</span><br><span class="line">            	<span class="comment">//子类必须要返回一个供父类转发的页面路径，如果子类想重定向，则return null;</span></span><br><span class="line">                String jspPath = (String)md.invoke(<span class="keyword">this</span>, req, resp);</span><br><span class="line">                <span class="keyword">if</span>(jspPath != <span class="keyword">null</span>)&#123;</span><br><span class="line">                	<span class="comment">//子类的所有方法，统一由父类转发</span></span><br><span class="line">                    req.getRequestDispatcher(jspPath).forward(req,resp);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 默认方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">excute</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&#160; &#160; &#160; &#160;至此，我们只需要在一个Servlet类中编写所有的请求方法就可以了，如果页面想发送请求，则需要编写如下个格式的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--需要给出method参数，如果不给出则执行exctue默认方法--&gt;</span><br><span class="line">&lt;a href&#x3D;&quot;$&#123;pageContext.request.contextPath&#125;&#x2F;studentServlet.do?method&#x3D;addStudent&quot; &gt;添加学生&lt;&#x2F;a&gt;</span><br></pre></td></tr></table></figure>
+<p>在StudentServlet中则对应如下的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">addStudent</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span></span>&#123;</span><br><span class="line">        Student student = <span class="keyword">new</span> Student();</span><br><span class="line">        <span class="comment">//将从页面获取的数据通过工具类封装到Bean里</span></span><br><span class="line">        MyBeanUtils.populate(student,req.getParameterMap());</span><br><span class="line">        StudentService stuService = <span class="keyword">new</span> StudentServiceImpl();</span><br><span class="line">        student.setSid(UUIDUtils.getId());</span><br><span class="line"><span class="comment">//        System.out.println(student);</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            stuService.addStudent(student);</span><br><span class="line">            resp.sendRedirect(<span class="string">"index.jsp"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="过滤器的操作"><a href="#过滤器的操作" class="headerlink" title="过滤器的操作"></a>过滤器的操作</h2><p>&#160; &#160; &#160; &#160;众所周知，从客户端传递过来的数据，或有中文的编码问题，post和get方法对应的解决方法也不同，主要原因在于传递数据的途径不一样，post将所有的数据都封装在http请求头的消息体（entity-body）中，用户可以自定义编码的类型；而Get的数据则通过URL进行传递，由浏览器进行编码（大部分都是iso8859-1）传递给Servlet。因此，对于POST请求，我们需要自己设置编码类型，而对于GET请求，我们需要用iso8859-1进行解码，再编码成UTF-8进行使用。如果对每一个Servlet方法都进行编码设置的话，会有大量的重复代码，因此，我们需要通过一个过滤器去拦截所有的请求，统一这些请求的编码格式再传递给后端。过滤器的作用如下：<br><img src="https://img-blog.csdnimg.cn/20190812215823201.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70" alt="过滤器"><br>&#160; &#160; &#160; &#160;过滤器的代码如下（过滤器也是需要注解配置的或者在web.xml中配置）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.memoforward.web.filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.*;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.annotation.WebFilter;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequestWrapper;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.UnsupportedEncodingException;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="comment">// /*表示拦截所有请求</span></span><br><span class="line"><span class="meta">@WebFilter</span>(filterName = <span class="string">"EncodingFilter"</span>, urlPatterns = <span class="string">"/*"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EncodingFilter</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest req, ServletResponse resp, FilterChain chain)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        HttpServletRequest request = (HttpServletRequest)req;</span><br><span class="line">        HttpServletResponse response = (HttpServletResponse)resp;</span><br><span class="line">        <span class="comment">//这个方法是过滤器放行的方法，我们通过在通过增强request来保证Servlet中使用的request能够</span></span><br><span class="line">        <span class="comment">//自动处理编码问题</span></span><br><span class="line">        chain.doFilter(<span class="keyword">new</span> EnhancedRequest(request), response);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig config)</span> <span class="keyword">throws</span> ServletException </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//web容器在使用HttpServletRequest接口时会自动创建HttpServletRequestWrapper实例（这里应该是通过依赖注入实现的 ，也不知道我理解的对不对）</span></span><br><span class="line">	<span class="comment">//继承一下这个类提醒一下这个知识点，毕竟原来是从接口直接调用的方法</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">EnhancedRequest</span> <span class="keyword">extends</span> <span class="title">HttpServletRequestWrapper</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> HttpServletRequest request;</span><br><span class="line">        <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">EnhancedRequest</span><span class="params">(HttpServletRequest req)</span></span>&#123;</span><br><span class="line">            <span class="keyword">super</span>(req);</span><br><span class="line">            <span class="keyword">this</span>.request = req;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getParameter</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(name==<span class="keyword">null</span> || name.trim().length()==<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            String[] values = getParameterValues(name);</span><br><span class="line">            <span class="keyword">if</span>(values==<span class="keyword">null</span> || values.length==<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> values[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * hobby=[eat,drink]</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> String[] getParameterValues(String name) &#123;</span><br><span class="line">            <span class="keyword">if</span>(name==<span class="keyword">null</span> || name.trim().length()==<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            Map&lt;String, String[]&gt; map = getParameterMap();</span><br><span class="line">            <span class="keyword">if</span>(map==<span class="keyword">null</span> || map.size()==<span class="number">0</span>)&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> map.get(name);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * map&#123; username=[tom],password=[123],hobby=[eat,drink]&#125;</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> Map&lt;String,String[]&gt; getParameterMap() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             * 首先判断请求方式</span></span><br><span class="line"><span class="comment">             * 若为post  request.setchar...(utf-8)</span></span><br><span class="line"><span class="comment">             * 若为get 将map中的值遍历编码就可以了</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            String method = request.getMethod();</span><br><span class="line">            <span class="keyword">if</span>(<span class="string">"post"</span>.equalsIgnoreCase(method))&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    request.setCharacterEncoding(<span class="string">"utf-8"</span>);</span><br><span class="line">                    <span class="keyword">return</span> request.getParameterMap();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">                    <span class="comment">// TODO Auto-generated catch block</span></span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"get"</span>.equalsIgnoreCase(method))&#123;</span><br><span class="line">                Map&lt;String,String[]&gt; map = request.getParameterMap();</span><br><span class="line">                <span class="keyword">if</span>(flag)&#123;</span><br><span class="line">                    <span class="keyword">for</span> (String key:map.keySet()) &#123;</span><br><span class="line">                        String[] arr = map.get(key);</span><br><span class="line">                        <span class="comment">//继续遍历数组</span></span><br><span class="line">                        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;arr.length;i++)&#123;</span><br><span class="line">                            <span class="comment">//编码</span></span><br><span class="line">                            <span class="keyword">try</span> &#123;</span><br><span class="line">                                arr[i]=<span class="keyword">new</span> String(arr[i].getBytes(<span class="string">"iso-8859-1"</span>),<span class="string">"utf-8"</span>);</span><br><span class="line">                            &#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">                                e.printStackTrace();</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    flag=<span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//需要遍历map 修改value的每一个数据的编码</span></span><br><span class="line">                <span class="keyword">return</span> map;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.getParameterMap();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="工具类的说明"><a href="#工具类的说明" class="headerlink" title="工具类的说明"></a>工具类的说明</h2><p>&#160; &#160; &#160; &#160;其实用不用工具类都行，这些东西其实和项目的关系都不是很大了，自己编写工具类的好处就是用起来爽，有什么需要添加的功能直接在类里面写，真正在Servlet或者其他地方调用的时候显得简洁和清晰。笔者这里使用了三个工具类，具体代码还请给位看官移步github。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- 关于c3p0操作的C3O0Utils类，使用最多的就是获取连接操作。</span><br><span class="line">- 关于Bean封装的MyBeanutils类，增强了beanutils包，主要实现了对日期格式的转换</span><br><span class="line">- 关于学生唯一id生成的UUIDUtils类，增强了 UUID包，主要是因为UUID获得数据是UUID格式的，比较让人不爽</span><br></pre></td></tr></table></figure>
+<h2 id="编写此项目的流程"><a href="#编写此项目的流程" class="headerlink" title="编写此项目的流程"></a>编写此项目的流程</h2><p>&#160; &#160; &#160; &#160; 在美工和数据库以及系统架构和环佩配置好了以后，就可以开始编写代码了，笔者比较喜欢的编码顺序是这样的：先把所有数据库中的实体Bean创建完毕（比如此项目中的Student），随后从美工界面出发一个个去将请求的Servlet方法编写完毕，servlet中调用的Service类就先定义出其接口。先把大逻辑搭建出来，等这个Servlet大逻辑编写完毕后再去实现低层的Service和Dao方法。当 “请求—servlet—service—dao” 的流程都都编写完成后，再去调试这个请求逻辑能不能跑通。当所有的请求都编写完后，这个项目就做完了。因为笔者比较菜，这个简单的项目用了一整天的时间才做完，期间也遇到了些许问题，如果有机会，希望能和各位多交流交流，各位如果有问题也可以在评论区问我。</p>
+<h1 id="本项目出现过的问题"><a href="#本项目出现过的问题" class="headerlink" title="本项目出现过的问题"></a>本项目出现过的问题</h1><p>&#160; &#160; &#160; &#160; 在项目中遇到了两个比较非常棘手的问题： </p>
+<ul>
+<li><strong>关闭或重启服务器会提示有线程释放不掉，导致内存泄漏</strong>。其实这是tomcat的一个误报，因为c3p0的线程需要时间去关闭，具体答案请参考StarkOverlFlow：<a href="https://stackoverflow.com/questions/39988634/c3p0-connection-pool-memory-leak-redeploy-tomcat" target="_blank" rel="noopener">c3p0 Connection pool memory leak redeploy tomcat</a></li>
+<li><strong>热部署的时候总是会提示 Illegal access: this web application instance has been stopped already.</strong> 这个问题似乎是因为tomcat缓存了该项目的旧版本，所以相当于一个tomcat启动了两个相同的项目所以报了异常。不影响项目的使用和调试，不过笔者水平有限，并没有解决这个问题，各位如果在运行本项目的时候遇到了这个问题，可以移步：<a href="https://stackoverflow.com/questions/4945153/illegal-access-this-web-application-instance-has-been-stopped-already" target="_blank" rel="noopener">Illegal access: this web application instance has been stopped already</a></li>
+</ul>
+<h1 id="交流"><a href="#交流" class="headerlink" title="交流"></a>交流</h1><blockquote>
+<p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>MemoForward
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2019/08/13/%E5%AD%A6%E7%94%9F%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F(JSP-Servlet-MySQL)/" title="学生管理系统（JSP+Servlet+MySQL）">http://yoursite.com/2019/08/13/学生管理系统(JSP-Servlet-MySQL)/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Project/" rel="tag"># Project</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/24/Java%E5%8F%8D%E5%B0%84%E8%AE%B2%E8%A7%A3%E4%B8%8E%E6%A1%88%E4%BE%8B%E5%AE%9E%E6%88%98/" rel="next" title="Java反射讲解与案例实战">
+      Java反射讲解与案例实战 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#项目功能"><span class="nav-number">2.</span> <span class="nav-text">项目功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#运用知识"><span class="nav-number">3.</span> <span class="nav-text">运用知识</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前期准备工作"><span class="nav-number">4.</span> <span class="nav-text">前期准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#导入jar包"><span class="nav-number">4.1.</span> <span class="nav-text">导入jar包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建包"><span class="nav-number">4.2.</span> <span class="nav-text">创建包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#持久层"><span class="nav-number">4.2.1.</span> <span class="nav-text">持久层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#控制层（统一放在web包下）"><span class="nav-number">4.2.2.</span> <span class="nav-text">控制层（统一放在web包下）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">4.2.3.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建配置文件"><span class="nav-number">4.3.</span> <span class="nav-text">创建配置文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#log4j-properties"><span class="nav-number">4.3.1.</span> <span class="nav-text">log4j.properties</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#c3p0-config-xml-最好不要修改名字"><span class="nav-number">4.3.2.</span> <span class="nav-text">c3p0-config.xml(最好不要修改名字)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建数据库"><span class="nav-number">5.</span> <span class="nav-text">创建数据库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#美工"><span class="nav-number">6.</span> <span class="nav-text">美工</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主界面"><span class="nav-number">6.1.</span> <span class="nav-text">主界面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑学生和添加学生界面"><span class="nav-number">6.2.</span> <span class="nav-text">编辑学生和添加学生界面</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#书写代码"><span class="nav-number">7.</span> <span class="nav-text">书写代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Jsp-Servlet-MySQL"><span class="nav-number">7.1.</span> <span class="nav-text">Jsp+Servlet+MySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增强Servlet"><span class="nav-number">7.2.</span> <span class="nav-text">增强Servlet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过滤器的操作"><span class="nav-number">7.3.</span> <span class="nav-text">过滤器的操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工具类的说明"><span class="nav-number">7.4.</span> <span class="nav-text">工具类的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写此项目的流程"><span class="nav-number">7.5.</span> <span class="nav-text">编写此项目的流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本项目出现过的问题"><span class="nav-number">8.</span> <span class="nav-text">本项目出现过的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交流"><span class="nav-number">9.</span> <span class="nav-text">交流</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MemoForward"
+      src="/images/personal.jpg">
+  <p class="site-author-name" itemprop="name">MemoForward</p>
+  <div class="site-description" itemprop="description">一个温柔又专情的闷骚之人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MemoForward" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MemoForward" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/qq_34294121" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_34294121" rel="noopener" target="_blank"><i class="fa fa-fw fa-crosshairs"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/chenxingyu@bupt.edu.cn" title="E-Mail → chenxingyu@bupt.edu.cn"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/memoforward" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;memoforward" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MemoForward</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='137' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      script.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '4a4e80d6432798f5c023',
+      clientSecret: 'ef38d73f2ebc13d42df25af78048c374729dceed',
+      repo        : 'memoforward.github.io',
+      owner       : 'MemoForward',
+      admin       : ['MemoForward'],
+      id          : 'df1c1627b8b13b5567000051702ab269',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>

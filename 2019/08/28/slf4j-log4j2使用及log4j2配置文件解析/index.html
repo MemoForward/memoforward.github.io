@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 本篇文章主要涉及以下知识点：  常用的日志框架（日志门面以及日志实现） slf4j+log4j2的使用 log4j2的傻瓜通用配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="slf4j+log4j2使用及log4j2配置文件解析">
+<meta property="og:url" content="http://yoursite.com/2019/08/28/slf4j-log4j2%E4%BD%BF%E7%94%A8%E5%8F%8Alog4j2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="MemoForward&#39;s Blog">
+<meta property="og:description" content="前言 本篇文章主要涉及以下知识点：  常用的日志框架（日志门面以及日志实现） slf4j+log4j2的使用 log4j2的傻瓜通用配置">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190828194222737.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2019-08-28T12:20:14.000Z">
+<meta property="article:modified_time" content="2020-03-03T14:27:21.174Z">
+<meta property="article:author" content="MemoForward">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190828194222737.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yoursite.com/2019/08/28/slf4j-log4j2%E4%BD%BF%E7%94%A8%E5%8F%8Alog4j2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>slf4j+log4j2使用及log4j2配置文件解析 | MemoForward's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="MemoForward's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MemoForward's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">阿星的学习笔记</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/MemoForward" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/28/slf4j-log4j2%E4%BD%BF%E7%94%A8%E5%8F%8Alog4j2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/personal.jpg">
+      <meta itemprop="name" content="MemoForward">
+      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MemoForward's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          slf4j+log4j2使用及log4j2配置文件解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-28 20:20:14" itemprop="dateCreated datePublished" datetime="2019-08-28T20:20:14+08:00">2019-08-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-03 22:27:21" itemprop="dateModified" datetime="2020-03-03T22:27:21+08:00">2020-03-03</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>本篇文章主要涉及以下知识点：</p>
+<ol>
+<li>常用的日志框架（日志门面以及日志实现）</li>
+<li>slf4j+log4j2的使用</li>
+<li>log4j2的傻瓜通用配置</li>
+</ol>
+</blockquote>
+<a id="more"></a>
+<h1 id="一些问题的修改与更新"><a href="#一些问题的修改与更新" class="headerlink" title="一些问题的修改与更新"></a>一些问题的修改与更新</h1><h2 id="将日志自动保存到不同的日志文件（19-10-03更新）"><a href="#将日志自动保存到不同的日志文件（19-10-03更新）" class="headerlink" title="将日志自动保存到不同的日志文件（19-10-03更新）"></a>将日志自动保存到不同的日志文件（19-10-03更新）</h2><p>·　　自己在做项目的时候遇到了一个问题：<strong>重新运行项目，如何把日志保存到不同的log文件？</strong><br>·　　我之前写的那个模板有一个重大的问题：每次运行程序，只要日志文件没超过maxSize，log都只会记录到这个文件。但是调试的时候，这种操作令人十分不爽，因此，在查询了官网之后，给模板进行了修改。</p>
+<p><font color="red"><strong>修改如下：</strong></font><br>·　　<strong>因为在普通的字符串里无法使用pattern的语法，因此使用<code>fileName=&quot;$${date:MM-dd-HH-ss}&quot;</code> 作为保存的日志名称，这样每次运行程序，日志必然会保存在不同的文件下。</strong><br>·　　实际上，我们完全可以构造两个FileAppender，这样就可以根据我们的需要来使用不同的日志文件记录方式了：本文的模板已更新，不喜可删。</p>
+<h1 id="什么是slf4j和log4j2"><a href="#什么是slf4j和log4j2" class="headerlink" title="什么是slf4j和log4j2"></a>什么是slf4j和log4j2</h1><p>·　　目前开源的日志框架有很多，如logback，log4j等，这面临了一个问题：当使用不同的日志框架或者这些日志框架面临了重大更新的时候，如果其实现函数有所改变，那么旧版本的框架就会崩溃，这很不利于项目的维护和新框架的推广。因此才诞生了例如slf4j这样的<strong>日志门面</strong>。<br>·　　日志门面，顾名思义就是日志框架对外的表现形式，理论上只要日志框架实现了日志门面的接口，不管其怎么更新，开发者都不需要对项目的依赖，或者项目的代码做出过多的改变。目前还在坚持更新且性能良好的日志门面非slf4j莫属，因此强烈建议使用slf4j作为我们书写日志的接口。<br>·　　日志框架方面，logback是log4j的升级版，这两个框架与slf4j是一个开发者开发出来的，因此其整合十分之稳定。但是log4j2作为apache最新推出的日志框架，在异步记录日志的方面性能比logback要更加的优异，<del>因此本着要用就用最好的的原则</del> ，使用lo4gj2作为日志记录的框架。<br>注：log4j2只是假借了log4j之名而已，log4j的真正升级版是logback。</p>
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><p>·　　日志的环境依赖总共有4部分，分别是<strong>slf4j接口</strong>部分，<strong>log4j2的日志框架</strong>实现部分，<strong>log4j2异步日志</strong>插件部分以及s<strong>lf4j与log4j2的桥接</strong>部分。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>包名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>slf4j-api</td>
+<td>目前的版本1.7就可。slf4j的接口包，我们对日志进行的所有操作都用的是这个包的API</td>
+</tr>
+<tr>
+<td>log4j-core</td>
+<td>版本必须在2.1以上，是log4j2的核心包</td>
+</tr>
+<tr>
+<td>log4j-api</td>
+<td>版本与核心包一致，log4j2的接口包，用来直接调用log4j2框架的，必须导入，不然无法与slf4j对接</td>
+</tr>
+<tr>
+<td>log4j-web</td>
+<td>版本与核心包一致，用于web项目的log4j2，阻止web项目出现警告</td>
+</tr>
+<tr>
+<td>com.lmax.disruptor</td>
+<td>版本随意，开启log4j2的异步日志记录的功能</td>
+</tr>
+<tr>
+<td>log4j-slf4j-impl</td>
+<td>版本与核心包一致，用于slf4j与log4j对接，即用slf4j的接口实现操作日志</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>这里给出一份Maven完整依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">log4j2.version</span>&gt;</span>2.11.2<span class="tag">&lt;/<span class="name">log4j2.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">slf4j.version</span>&gt;</span>1.7.28<span class="tag">&lt;/<span class="name">slf4j.version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-web --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/com.lmax/disruptor --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.lmax<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>disruptor<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.4.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;slf4j.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.logging.log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j-slf4j-impl<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;log4j2.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>·　　看多很多的博客，都没有官网的配置全面，因此给出官网传送门：<a href="https://logging.apache.org/log4j/2.x/manual/configuration.html" target="_blank" rel="noopener">log4j2官网详细配置说明</a><br>·　　本博客给出一种粘贴复制即可用的配置，并给出一些个人认为比较重要的说明。</p>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>·　　基本上所有的配置都写在了Properties里，因此，只需要改Properties就可以用了（建议自定义Logger，不建议修改Appenders）。<br>Apperders里定义了两种日志记录的格式：1. 在控制台输出name=“Console”，2. 在文件输出name=“File”。使用RollingRandomAccessFileAppender是因为其性能最好，且支持日志自动归档。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- https://www.cnblogs.com/hafiz/p/6170701.html--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">Configuration</span> <span class="attr">status</span>=<span class="string">"WARN"</span> <span class="attr">name</span>=<span class="string">"MyApp"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">Properties</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--日志文件保存的路径--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"filePath"</span> <span class="attr">value</span>=<span class="string">"src/logs/$$&#123;date:MM-dd-HH-mm-ss&#125;-untitled.log"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"filePath_onlyOne"</span> <span class="attr">value</span>=<span class="string">"src/logs/untitled.log"</span>/&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--日志文件归档后保存的压缩文件路径--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"filePattern"</span> <span class="attr">value</span>=<span class="string">"src/logs/$$&#123;date:yyyy-MM&#125;/untitled-%d&#123;yyyy-MM-dd-HH&#125;-%i.log.zip"</span>/&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--日志文档超过多大时执行翻转（即：将旧文件压缩，并用新日志文件记录）--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"maxSize"</span> <span class="attr">value</span>=<span class="string">"250 MB"</span>/&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--记录的日志文件超过多少时，旧文件会被删除--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"maxFile"</span> <span class="attr">value</span>=<span class="string">"50"</span>/&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--打印日志的时候是否标注日志在项目的位置信息--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"useLocation"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--日志输出格式--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"layoutPattern"</span> <span class="attr">value</span>=<span class="string">"%date %p %c&#123;1.&#125; [%thread] %location %message %exception%n"</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">Properties</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">Appenders</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">Console</span> <span class="attr">name</span>=<span class="string">"Console"</span> <span class="attr">target</span>=<span class="string">"SYSTEM_OUT"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">PatternLayout</span> <span class="attr">pattern</span>=<span class="string">"$&#123;layoutPattern&#125;"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">Console</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">RollingRandomAccessFile</span> <span class="attr">name</span>=<span class="string">"File"</span> <span class="attr">fileName</span>=<span class="string">"$&#123;filePath&#125;"</span> <span class="attr">filePattern</span>=<span class="string">"$&#123;filePattern&#125;"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">PatternLayout</span> <span class="attr">pattern</span>=<span class="string">"$&#123;layoutPattern&#125;"</span>/&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">Policies</span>&gt;</span></span><br><span class="line">				<span class="comment">&lt;!--基于时间的归档，一般不使用--&gt;</span></span><br><span class="line">				<span class="comment">&lt;!--这个6基于filePattern归档文件的时间，本文件归档的filePattern最后的HH表示小时，因此此文件每6个小时进行一次归档--&gt;</span></span><br><span class="line">				<span class="comment">&lt;!-- &lt;TimeBasedTriggeringPolicy interval="6" modulate="true"/&gt;--&gt;</span></span><br><span class="line">				<span class="comment">&lt;!--基于文件大小的归档--&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">SizeBasedTriggeringPolicy</span> <span class="attr">size</span>=<span class="string">"$&#123;maxSize&#125;"</span>/&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">Policies</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">DefaultRolloverStrategy</span> <span class="attr">max</span>=<span class="string">"$&#123;maxFile&#125;"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">RollingRandomAccessFile</span>&gt;</span></span><br><span class="line">		</span><br><span class="line">		<span class="tag">&lt;<span class="name">RollingRandomAccessFile</span> <span class="attr">name</span>=<span class="string">"OneFile"</span> <span class="attr">fileName</span>=<span class="string">"$&#123;filePath_onlyOne&#125;"</span> <span class="attr">filePattern</span>=<span class="string">"$&#123;filePattern&#125;"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">PatternLayout</span> <span class="attr">pattern</span>=<span class="string">"$&#123;layoutPattern&#125;"</span>/&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">Policies</span>&gt;</span></span><br><span class="line">				<span class="comment">&lt;!--基于文件大小的归档--&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">SizeBasedTriggeringPolicy</span> <span class="attr">size</span>=<span class="string">"$&#123;maxSize&#125;"</span>/&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">Policies</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">DefaultRolloverStrategy</span> <span class="attr">max</span>=<span class="string">"$&#123;maxFile&#125;"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">RollingRandomAccessFile</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">Appenders</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!--这个只能自行配置了--&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">Loggers</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--异步日志Root（与同步Root之间只能存在一个）--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		&lt;AsyncRoot level="DEBUG" includeLocation="$&#123;useLocation&#125;"&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--			&lt;AppenderRef ref="Console"/&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--			&lt;AppenderRef ref="File"/&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		&lt;/AsyncRoot&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		        同步Root--&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">Root</span> <span class="attr">level</span>=<span class="string">"INFO"</span> &gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">AppenderRef</span> <span class="attr">ref</span>=<span class="string">"File"</span>/&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">AppenderRef</span> <span class="attr">ref</span>=<span class="string">"Console"</span>/&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">Root</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--异步日志(与同步日志可同时存在)--&gt;</span></span><br><span class="line">		<span class="comment">&lt;!--name属性值请自定义--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		&lt;AsyncLogger name="AsyncLogger" level="DEBUG" includeLocation="$&#123;useLocation&#125;" additivity="false"&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--			&lt;AppenderRef ref="File"/&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		&lt;/AsyncLogger&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		同步日志--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		&lt;Logger name="com.memoforward.dao" level="DEBUG" includeLocation="$&#123;useLocation&#125;" additivity="false"&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--			&lt;AppenderRef ref="Console"/&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--		&lt;/Logger&gt;--&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">Loggers</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置的简单说明："><a href="#配置的简单说明：" class="headerlink" title="配置的简单说明："></a>配置的简单说明：</h2><h3 id="RollingRandomAccessFile标签"><a href="#RollingRandomAccessFile标签" class="headerlink" title="RollingRandomAccessFile标签"></a>RollingRandomAccessFile标签</h3><ul>
+<li><p>RollingRandomAccessFile的三个属性的含义：</p>
+<ol>
+<li>name：这个Appender的引用名</li>
+<li>fileName：日志文件的路径及名称（文件夹或文件不存在就自动创建）</li>
+<li>filePattern：日志归档后的文件的保存路径和名称（如果加了.zip就自动压缩）</li>
+</ol>
+</li>
+<li><p>RollingRandomAccessFile必须配置的两个字标签：</p>
+<ol>
+<li>TriggerPolicy：文件翻转触发机制。翻转的意思就是旧文件保存（归档），另起新文件进行记录。 <ul>
+<li>在上述配置文件中，其触发机制是SizeBasedTriggeringPolicy，即：当文件大小超过一定阈值后，进行自动保存</li>
+</ul>
+</li>
+<li>RolloverStrategy：文件翻转策略。<ul>
+<li>在上述配置文件中，其策略是默认策略，当归档的文件数量达到一定数值后，就自动删除旧文件（如果不配置，则默认为7）</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><strong>测试代码如下</strong>：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.testng.annotations.Test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Log4j2Test</span> </span>&#123;</span><br><span class="line"><span class="comment">//    private static final Logger logger = LoggerFactory.getLogger(Log4j2Test.class);</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(<span class="string">"AsyncLogger"</span>);</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testLog</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">500</span>; i++)&#123;</span><br><span class="line">            logger.error(Integer.toString(i));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>测试结果如下</strong><br>设置了保存的文件最大为1KB，最大保存文件数量为10，保存500条日志。每篇日志能保存9条语句。<br><img src="https://img-blog.csdnimg.cn/20190828194222737.PNG?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0Mjk0MTIx,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></li>
+</ul>
+<ul>
+<li><strong>untitled.log输出如下</strong>：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">2019-08-28 19:16:52,248 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 491 </span><br><span class="line">2019-08-28 19:16:52,248 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 492 </span><br><span class="line">2019-08-28 19:16:52,248 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 493 </span><br><span class="line">2019-08-28 19:16:52,248 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 494 </span><br><span class="line">2019-08-28 19:16:52,248 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 495 </span><br><span class="line">2019-08-28 19:16:52,248 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 496 </span><br><span class="line">2019-08-28 19:16:52,249 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 497 </span><br><span class="line">2019-08-28 19:16:52,250 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 498 </span><br><span class="line">2019-08-28 19:16:52,250 ERROR AsyncLogger [main] Log4j2Test.testLog(Log4j2Test.java:11) 499</span><br></pre></td></tr></table></figure>
+<p>·　　可见，如果不设置翻转的机制，要么会在一个日志文件内记录所有的数据，要么仅会保存7条归档的日志。一般情况下，希望能把所有的归档日志文件都保存下来，因此RolloverStragety的值要设置的大一点。</p>
+<h3 id="Logger的配置"><a href="#Logger的配置" class="headerlink" title="Logger的配置"></a>Logger的配置</h3><p>·　　Logger分为同步和异步，只有一个RootLogger。异步的实现就是我们之前引入的那个<strong>com.lmax.disruptor</strong>包，当我们启用异步日志记录的时候，就会新建一个Disruptor对象，具体的日志记录流程建议参考这位大佬的文章:<a href="https://www.cnblogs.com/yeyang/p/7944906.html" target="_blank" rel="noopener">Log4j2中的同步日志与异步日志</a>。</p>
+<ul>
+<li><p>Logger中属性的含义：</p>
+<ol>
+<li>name：在代码getLogger的名字，root没有此属性。</li>
+<li>level：日志的打印级别为”<strong>OFF&gt;FATAL&gt;ERROR&gt;WARN&gt;INFO&gt;DEBUG&gt;TRACE</strong>“。logger在记录日志的时候，只会记录level界别及以上的日志内容(OFF永远不会打印)。如设置了ERROR，只会打印FATAL和ERROR。</li>
+<li>includeLoacation：日志打印的时候是否会输出位置（打印位置会降低性能）。</li>
+<li>additivity：root没有，配置此属性值为true来避免重复打印（如果为false，root会重复打印一次相同级别的日志），至于为什么会重复打印，还是建议大家看一下官方文档，这里不赘述了。</li>
+</ol>
+</li>
+<li><p>Logger的子标签<br>  1.&lt; AppenderRef ref=”xxx” &gt; 表示这个logger将用到何种Appender，ref内写Appender的name属性值。</p>
+</li>
+</ul>
+<h3 id="PatternLayout解释"><a href="#PatternLayout解释" class="headerlink" title="PatternLayout解释"></a>PatternLayout解释</h3><p>·　　本配置文件默认的layoutPattern为：<strong>%date %p %c{1.} [%thread] %location %message %exception%n</strong><br>·　　官网有特别特别详细的说明文档，我这个都是对着官网写出来的，特别好理解，强烈建议大家对看文档。传送门：<a href="https://logging.apache.org/log4j/2.x/manual/layouts.html" target="_blank" rel="noopener">log4j2的LayoutPattern</a>；本博客就只介绍一下上面的这行配置。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%date</td>
+<td>输出日期和时间：yyyy-MM-dd HH:mm:ss,SSS（年-月-日 时：分：秒，毫秒）</td>
+</tr>
+<tr>
+<td>%p</td>
+<td>输出日志的打印级别</td>
+</tr>
+<tr>
+<td>%c{1.}</td>
+<td>输出该日志所处的缩略类路径</td>
+</tr>
+<tr>
+<td>%[thread]</td>
+<td>打印执行该日志记录的线程名</td>
+</tr>
+<tr>
+<td>%location</td>
+<td>打印日志语句在项目代码中的位置</td>
+</tr>
+<tr>
+<td>%message</td>
+<td>日志内容</td>
+</tr>
+<tr>
+<td>%exception</td>
+<td>如果出现了异常，则打印异常</td>
+</tr>
+<tr>
+<td>%n</td>
+<td>类似于/n，是换行符</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>·　　日志记录一直是一个很尴尬的点，感觉不难，但一直理解不是很深刻，其实我们最常用的就是把日志输出到控制台或者输出到文件，私以为只要把这两个方面搞明白了就行。以后做项目，尽量就用slf4j+log4j2来记录日志啦。</p>
+<h1 id="交流"><a href="#交流" class="headerlink" title="交流"></a>交流</h1><blockquote>
+<p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>MemoForward
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2019/08/28/slf4j-log4j2%E4%BD%BF%E7%94%A8%E5%8F%8Alog4j2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90/" title="slf4j+log4j2使用及log4j2配置文件解析">http://yoursite.com/2019/08/28/slf4j-log4j2使用及log4j2配置文件解析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/27/Java%E4%B8%ADXML%E6%96%87%E4%BB%B6%E7%9A%84%E8%A7%A3%E6%9E%90%EF%BC%88Dom4j-Xpath%EF%BC%89/" rel="prev" title="Java中XML文件的解析（Dom4j+Xpath）">
+      <i class="fa fa-chevron-left"></i> Java中XML文件的解析（Dom4j+Xpath）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/29/Java%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E5%AE%9E%E6%88%98/" rel="next" title="Java工厂模式实战">
+      Java工厂模式实战 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一些问题的修改与更新"><span class="nav-number">2.</span> <span class="nav-text">一些问题的修改与更新</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#将日志自动保存到不同的日志文件（19-10-03更新）"><span class="nav-number">2.1.</span> <span class="nav-text">将日志自动保存到不同的日志文件（19-10-03更新）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是slf4j和log4j2"><span class="nav-number">3.</span> <span class="nav-text">什么是slf4j和log4j2</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#依赖"><span class="nav-number">4.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置"><span class="nav-number">5.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件"><span class="nav-number">5.1.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置的简单说明："><span class="nav-number">5.2.</span> <span class="nav-text">配置的简单说明：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RollingRandomAccessFile标签"><span class="nav-number">5.2.1.</span> <span class="nav-text">RollingRandomAccessFile标签</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logger的配置"><span class="nav-number">5.2.2.</span> <span class="nav-text">Logger的配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PatternLayout解释"><span class="nav-number">5.2.3.</span> <span class="nav-text">PatternLayout解释</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#交流"><span class="nav-number">7.</span> <span class="nav-text">交流</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="MemoForward"
+      src="/images/personal.jpg">
+  <p class="site-author-name" itemprop="name">MemoForward</p>
+  <div class="site-description" itemprop="description">一个温柔又专情的闷骚之人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/MemoForward" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;MemoForward" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/qq_34294121" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_34294121" rel="noopener" target="_blank"><i class="fa fa-fw fa-crosshairs"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/chenxingyu@bupt.edu.cn" title="E-Mail → chenxingyu@bupt.edu.cn"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/memoforward" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;memoforward" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">MemoForward</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='137' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.getAttribute('pjax') !== null) {
+      script.setAttribute('pjax', '');
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '4a4e80d6432798f5c023',
+      clientSecret: 'ef38d73f2ebc13d42df25af78048c374729dceed',
+      repo        : 'memoforward.github.io',
+      owner       : 'MemoForward',
+      admin       : ['MemoForward'],
+      id          : 'c24b127766d606fd9babac0bb2122bb4',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+    </div>
+</body>
+</html>
