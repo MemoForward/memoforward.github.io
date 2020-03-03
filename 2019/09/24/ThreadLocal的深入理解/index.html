@@ -240,7 +240,7 @@
 <ol>
 <li><strong><code>synchronized</code>方法是最能解决线程安全问题的方法，因为多线程能够安全地操作同一块内存地址的区域，这是其他方法做不到的。</strong> 但是这个方法弊端也很明显，多线程串行执行一个任务，效率极低(当然现在的锁进行了很多的优化措施，至少不会让某个线程在一个任务上长时间阻塞了，这个不是重点)。</li>
 <li>非阻塞同步方法解决了线程串行的问题，但是存在ABA隐患(这也不是重点，所谓ABA请自行搜索啦)。</li>
-<li><code>ThreadLocal</code>方法，它并不能解决一部分的线程安全问题，因为就算你使用了<code>ThreadLocal</code>，你也无法阻止多线程操作同一块内存空间的隐患，而<code>ThreadLocal</code>却解决了在web领域的一个重大的问题：<strong><font color='red'>各线程的独立操作共享数据</font></strong>。</li>
+<li><code>ThreadLocal</code>方法，它并不能解决一部分的线程安全问题，因为就算你使用了<code>ThreadLocal</code>，你也无法阻止多线程操作同一块内存空间的隐患，而<code>ThreadLocal</code>却解决了在web领域的一个重大的问题：<strong><font color="red">各线程的独立操作共享数据</font></strong>。</li>
 </ol>
 <h1 id="ThreadLocal使用场景解释"><a href="#ThreadLocal使用场景解释" class="headerlink" title="ThreadLocal使用场景解释"></a>ThreadLocal使用场景解释</h1><p>·　　很多小伙伴都懵逼了，“独立操作共享数据”是什么意思？其实很简单，我这里的解释需要涉及一点Servlet的知识才可以懂。</p>
 <ul>

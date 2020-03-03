@@ -323,7 +323,7 @@
 <li>父类<code>Test</code>中成员变量<code>person</code>赋值完毕，执行构造函数,输出：<code>test constructor</code></li>
 <li>随后进行子类对象<code>MyClass</code>初始化，因为<code>Person</code>类已经加载过，因此不会再加载了，所以先后输出:<code>person MyClass</code>和<code>myClass constructor</code></li>
 </ol>
-<p><font color='red'> Attention: </font><br>这里有个小细节：子类所有实例化操作（包括成员变量赋值和构造器）都慢于父类实例化的操作，而实例化操作的顺序是：先进行成员变量赋值，再执行构造函数。</p>
+<p><font color="red"> Attention: </font><br>这里有个小细节：子类所有实例化操作（包括成员变量赋值和构造器）都慢于父类实例化的操作，而实例化操作的顺序是：先进行成员变量赋值，再执行构造函数。</p>
 
     </div>
 
