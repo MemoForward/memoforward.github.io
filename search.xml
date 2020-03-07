@@ -113,6 +113,9 @@
 </ul>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">TreeNode <span class="title">filpColors</span><span class="params">(TreeNode h)</span></span>&#123;</span><br><span class="line">	h.left.color = BLACK;</span><br><span class="line">	h.right.color = BLACK;</span><br><span class="line">	h.color = RED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id><a href="#" class="headerlink" title=" "></a> </h3>]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>Java基础</tag>
@@ -196,6 +199,9 @@
 </ul>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> memoforward.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAnonInnerClass</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        IPerson person = PersonProxy.getPerson();</span><br><span class="line">        person.eat();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     输出结果：</span></span><br><span class="line"><span class="comment">     1. 做饭...</span></span><br><span class="line"><span class="comment">     2. 吃饭...</span></span><br><span class="line"><span class="comment">     3. 洗碗...</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IPerson</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">eat</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">implements</span> <span class="title">IPerson</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">eat</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"吃饭..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PersonProxy</span></span>&#123;</span><br><span class="line">    <span class="keyword">static</span> IPerson person = <span class="keyword">new</span> Person();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IPerson <span class="title">getPerson</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//使用匿名内部类InvocationHandler，重写invoke方法，对Person接口的所有方法进行增强</span></span><br><span class="line">        <span class="keyword">return</span> (IPerson) Proxy.newProxyInstance(person.getClass().getClassLoader()</span><br><span class="line">                , person.getClass().getInterfaces(), <span class="keyword">new</span> InvocationHandler() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">                        Object obj = <span class="keyword">null</span>;</span><br><span class="line">                        <span class="keyword">try</span>&#123;</span><br><span class="line">                            System.out.println(<span class="string">"做饭..."</span>);</span><br><span class="line">                            obj = method.invoke(person);</span><br><span class="line">                            <span class="keyword">return</span> obj;</span><br><span class="line">                        &#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">                            System.out.println(<span class="string">"饭馊了..."</span>);</span><br><span class="line">                            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"没吃上饭:"</span> + e);</span><br><span class="line">                        &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">                            System.out.println(<span class="string">"洗碗..."</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>Java基础</tag>
@@ -306,6 +312,9 @@
 </ol>
 <p><font color="red"> Attention: </font><br>这里有个小细节：子类所有实例化操作（包括成员变量赋值和构造器）都慢于父类实例化的操作，而实例化操作的顺序是：先进行成员变量赋值，再执行构造函数。</p>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>Java基础</tag>
@@ -339,6 +348,9 @@
 <h1 id="Java中的HashMap"><a href="#Java中的HashMap" class="headerlink" title="Java中的HashMap"></a>Java中的HashMap</h1><p>具体可以移步我的博客：<a href>浅谈Java中的HashMap以及红黑树</a></p>
 <h1 id="Java中的LinkedHashMap"><a href="#Java中的LinkedHashMap" class="headerlink" title="Java中的LinkedHashMap"></a>Java中的LinkedHashMap</h1><p>具体可以移步我的博客：<a href>浅谈Java中LinkedHashMap的实现</a></p>
 ]]></content>
+      <categories>
+        <category>面试题</category>
+      </categories>
       <tags>
         <tag>面试</tag>
       </tags>
@@ -427,6 +439,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
       <tags>
         <tag>MySQL</tag>
       </tags>
@@ -553,6 +568,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
       </tags>
@@ -642,6 +660,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>并发</tag>
@@ -816,6 +837,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Spring</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>SSM</tag>
@@ -1024,6 +1048,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Spring</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>SSM</tag>
@@ -1230,6 +1257,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
       </tags>
@@ -1548,6 +1578,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Spring</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>SSM</tag>
@@ -1659,6 +1692,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>设计模式</tag>
@@ -1817,8 +1853,11 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
-        <tag>Java</tag>
+        <tag>Java - 日志框架</tag>
       </tags>
   </entry>
   <entry>
@@ -1948,6 +1987,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
       </tags>
@@ -2043,6 +2085,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
       </tags>
@@ -2107,6 +2152,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
       <tags>
         <tag>Java</tag>
       </tags>
@@ -2179,6 +2227,9 @@
 <p>请联系邮箱：chenxingyu@bupt.edu.cn</p>
 </blockquote>
 ]]></content>
+      <categories>
+        <category>项目</category>
+      </categories>
       <tags>
         <tag>Java</tag>
         <tag>Project</tag>
