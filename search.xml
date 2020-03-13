@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>浅谈Integer</title>
+    <url>/2020/03/13/%E6%B5%85%E8%B0%88Integer/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>本博客主要涉及以下几个内容：</p>
+<ol>
+<li>装箱与拆箱</li>
+<li>装箱生成的Integer在哪里</li>
+<li>案例</li>
+</ol>
+</blockquote>
+<a id="more"></a>
+<h1 id="装箱与拆箱"><a href="#装箱与拆箱" class="headerlink" title="装箱与拆箱"></a>装箱与拆箱</h1><p>　　Java中有八种基本数据类型: byte, short, int, long, float, double, char, boolean。这八种基本数据类型对应着八个包装类，<strong>基本数据类型</strong>转换为<strong>包装类</strong>叫做装箱，反之叫做拆箱。</p>
+<h2 id="为什么要进行装箱和拆箱？"><a href="#为什么要进行装箱和拆箱？" class="headerlink" title="为什么要进行装箱和拆箱？"></a>为什么要进行装箱和拆箱？</h2><p>　　Java中最主要有三类存储空间: 栈，堆，方法区。栈中存基本数据类型和堆中对象的引用；堆中一般存放运行时的动态数据，最主要有<code>new</code>出来的对象;方法区中存储的数据不是本文的重点，就不细说了，本文只涉及方法区中的常量池，常量池中存储的是常量。<br>　　基本数据类型因为经常被使用，所以为了提高效率，都放在栈中进行运算；但是栈中的数据并不具备持久性，对于Java中同样经常使用的容器，栈中的数据显然不具备放入容器中的资格，因此才有了装箱和拆箱的步骤。JDK5后，Java实现了自动装箱和拆箱。</p>
+<h2 id="如何进行装箱和拆箱"><a href="#如何进行装箱和拆箱" class="headerlink" title="如何进行装箱和拆箱"></a>如何进行装箱和拆箱</h2><p>　　这里不放java反编译后的结果了，直接说结论。只给出<code>int</code>和<code>Integer</code>之间的转换。</p>
+<ul>
+<li>代码</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Integer in = <span class="number">9</span>; <span class="comment">//装箱</span></span><br><span class="line"><span class="keyword">int</span> i = in; <span class="comment">//拆箱</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>装箱调用：<code>Integer in = Integer.valueOf(9)</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</span><br><span class="line">        <span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Integer(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>拆箱调用：<code>int i = in.intValue()</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">intValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="装箱生成的Integer去了哪里？"><a href="#装箱生成的Integer去了哪里？" class="headerlink" title="装箱生成的Integer去了哪里？"></a>装箱生成的Integer去了哪里？</h1><p>　　上面的源码引出了一个新的类<code>IntegerCache</code>, 这个类是<code>Integer</code>类的静态内部类，内部存在三个常量：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> low = -<span class="number">128</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> high;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Integer cache[];</span><br></pre></td></tr></table></figure>
+<p>　　常量<code>high</code>会在类中的静态代码块中被赋值为<code>127</code>，<code>cache[]</code>中存储了<code>value</code>为<code>-128 ~ 127</code>的<code>Integer</code>包装类。<br>　　由源码可知：当装箱的<code>int</code>值在<code>-128 ~ 127</code>中时，<code>Integer</code>会直接返回常量池中的对象，而这些对象，在<code>Integer</code>类加载的时候就被创建了，因此不会再开辟多余的空间。而当<code>int</code>的值超过范围，则会在堆中重新开辟<code>Integer</code>对象的空间。</p>
+<h1 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> a = <span class="number">99</span>;</span><br><span class="line"><span class="keyword">int</span> b = <span class="number">128</span>;</span><br><span class="line">Integer A = a;</span><br><span class="line">Integer AA = <span class="number">99</span>;</span><br><span class="line">Integer B = b;</span><br><span class="line">Integer BB = <span class="number">128</span>;</span><br><span class="line">System.out.println(AA == A); <span class="comment">// true</span></span><br><span class="line">System.out.println(BB == B); <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+<p>解释：</p>
+<ol>
+<li><code>A</code>和<code>AA</code>都指向常量池中的<code>Integer</code>对象</li>
+<li><code>B</code>和<code>BB</code>都是在执行装箱操作后<code>new</code>出来的<code>Integer</code>对象，因此地址不同</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java基础</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LeetCode题解(一):10, 15, 57, 59</title>
     <url>/2020/03/07/LeetCode%E9%A2%98%E8%A7%A3-%E4%B8%80-10-15-57-59/</url>
     <content><![CDATA[<h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><blockquote>
