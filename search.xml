@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>LeetCode题解:39,41,42</title>
+    <url>/2020/06/27/LeetCode%E9%A2%98%E8%A7%A3-39-41-42/</url>
+    <content><![CDATA[<h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><blockquote>
+<p>第39题：<a href="https://leetcode-cn.com/problems/combination-sum/" target="_blank" rel="noopener">组合总和(中等)</a></p>
+<p>第41题：<a href="https://leetcode-cn.com/problems/first-missing-positive/" target="_blank" rel="noopener">缺失的第一个正数(困难)</a></p>
+<p>第42题：<a href="https://leetcode-cn.com/problems/trapping-rain-water/" target="_blank" rel="noopener">接雨水(困难)</a></p>
+</blockquote>
+<a id="more"></a>
+<hr>
+<h1 id="第39题：组合总和"><a href="#第39题：组合总和" class="headerlink" title=" 第39题：组合总和 "></a><font color="red"> 第39题：组合总和 </font></h1><h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个无重复元素的数组<code>candidates</code> 和一个目标数<code>target</code> ，找出<code>candidates</code> 中所有可以使数字和为<code>target</code>的组合。</p>
+<p><code>candidates</code> 中的数字可以无限制重复被选取。</p>
+<blockquote>
+<p>时间复杂度: O(n)</p>
+<p>空间复杂度: O(1)</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>算法题</category>
+      </categories>
+      <tags>
+        <tag>面试题</tag>
+        <tag>算法题</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>浅谈Integer</title>
     <url>/2020/03/13/%E6%B5%85%E8%B0%88Integer/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
