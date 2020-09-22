@@ -194,6 +194,368 @@
       </tags>
   </entry>
   <entry>
+    <title>HTTP详解</title>
+    <url>/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>本文主要梳理HTTP协议的知识体系</p>
+<ol>
+<li>HTTP基础</li>
+<li>DNS</li>
+<li>HTTP缓存策略</li>
+<li>HTTPS</li>
+<li>常见问题</li>
+</ol>
+</blockquote>
+<a id="more"></a>
+<h1 id="HTTP各版本之间的差异"><a href="#HTTP各版本之间的差异" class="headerlink" title="HTTP各版本之间的差异"></a>HTTP各版本之间的差异</h1><p>超文本传输协议。<strong>「HTTP 是一个在计算机世界里专门在两点之间传输文字、图片、音频、视频等超文本数据的约定和规范」</strong>。</p>
+<h2 id="HTTP-0-9"><a href="#HTTP-0-9" class="headerlink" title="HTTP 0.9"></a>HTTP 0.9</h2><ul>
+<li>只有一个GET请求，只支持纯文本，早已过时</li>
+</ul>
+<h2 id="HTTP-1-0"><a href="#HTTP-1-0" class="headerlink" title="HTTP 1.0"></a>HTTP 1.0</h2><ul>
+<li>可以传送任何格式的文件，如图像、视频、文本等。</li>
+<li>除了GET命令，还有POST和HEAD等。</li>
+<li>HTTP的请求和回应的格式改变，除了数据部分，每次通信还必须包含头信息（HTTP header），用来描述一些元数据。</li>
+<li>只使用header中<code>If-Modified-Since</code> 和<code>Expires</code>作为缓存失效的标准。</li>
+<li>不支持断点续传，每次都会传送全部的页面和数据。</li>
+<li>通常每台计算机只能绑定一个 IP，所以请求消息中的 URL 并没有传递主机名（hostname）</li>
+<li><code>keep-alive</code>（默认关闭）</li>
+</ul>
+<h2 id="HTTP-1-1"><a href="#HTTP-1-1" class="headerlink" title="HTTP 1.1"></a>HTTP 1.1</h2><p>HTTP是当前最主流的http协议版本。</p>
+<ul>
+<li>支持持久连接（presistent connection），即TCP连接默认不关闭，可以被多个请求复用。长连接的连接时长由请求头中的<code>keep-alive</code>（默认开启）来设置。</li>
+<li>引入了管道机制（pipeline），即在同一个TCP连接里，客户端可以同时发送多条请求，提高了HTTP协议的效率。</li>
+<li>HTTP 1.1 中新增加了 <code>E-tag，If-Unmodified-Since, If-Match, If-None-Match</code>等缓存控制标头来控制缓存失效。</li>
+<li>支持断点续传，通过使用请求头中的<code>Range</code>来实现。</li>
+<li>使用了虚拟网络，在一台物理服务器上可以存在多个物理主机（Multi-homed Web Servers），并且它们共享一个ip地址。</li>
+<li>新增方法：PUT、 PATCH、 OPTIONS、 DELETE。</li>
+</ul>
+<h2 id="HTTP-1-x-的版本问题"><a href="#HTTP-1-x-的版本问题" class="headerlink" title="HTTP 1.x 的版本问题"></a>HTTP 1.x 的版本问题</h2><ul>
+<li>传输的数据都是明文，没有加密，客户端和服务端都无法验证对方的身份，很不安全。</li>
+<li>HTTP/1.1默认允许复用TCP连接，但是在同一个TCP连接里，所有的数据都是有序传输的，服务器只有处理完一个回应后才会去处理下一个，因此如果前面有数据阻塞，后面的都无法传输，这就是<strong>队头阻塞</strong>。</li>
+<li>HTTP/1.x 支持长连接，为了避免创建多次连接产生的延迟，但是这同样会给服务器带来压力。对于单文件的请求，在请求结束后还会保持不必要的连接。</li>
+</ul>
+<h3 id="聊一聊队头阻塞"><a href="#聊一聊队头阻塞" class="headerlink" title="聊一聊队头阻塞"></a>聊一聊队头阻塞</h3><p>　　对于每一个HTTP/1.x请求而言，这些任务是会被放入一个任务队列中串行执行的，一旦队首任务请求太慢时，就会阻塞后面的请求处理，这就是<code>HTTP队头阻塞</code>问题。可以通过如下方式解决：</p>
+<ul>
+<li>并发连接：增加多个TCP连接。</li>
+<li>域名分片：把一个域名分成很多二级域名，相当于也是增加了多个连接</li>
+</ul>
+<h2 id="HTTP-2-0"><a href="#HTTP-2-0" class="headerlink" title="HTTP 2.0"></a>HTTP 2.0</h2><ul>
+<li><strong>二进制分帧：</strong>将数据全部转为二进制，头信息和数据体都是二进制，统称为<strong>“帧”</strong>：头信息帧和数据帧。</li>
+<li><strong>头部压缩：</strong>HTTP/1.x版本中可能会出现的<code>User-Agent、Cookie、Accept、Server、Range</code>等字段可能会占用几百甚至几千字节，而body部分可能才几十字节，导致头部偏重。HTTP 2.0 使用 <code>HPACK</code> 算法进行压缩。</li>
+<li><strong>多路复用：</strong>复用TCP连接，在一个连接里，客户端和浏览器都可以同时发送多个请求和回应，且不用按照顺序一一对应，这样就解决了队头阻塞的问题。</li>
+<li><strong>服务器推送：</strong> 允许服务器未经请求，主动向客户端发送资源，即服务器推送。</li>
+<li><strong>请求优先级：</strong> 可以设置数据帧的优先级，让服务端先处理重要资源，优化用户体验。</li>
+</ul>
+<h1 id="HTTP-2-0介绍"><a href="#HTTP-2-0介绍" class="headerlink" title="HTTP 2.0介绍"></a>HTTP 2.0介绍</h1><p>更加详细且权威的内容请参考：<a href="https://developers.google.com/web/fundamentals/performance/http2/?hl=zh-CN" target="_blank" rel="noopener">谷歌开发手册HTTP2.0</a>。</p>
+<h2 id="头部压缩"><a href="#头部压缩" class="headerlink" title="头部压缩"></a>头部压缩</h2><p>　　上一节讲到HTTP/1.x的头部包含了太多的内容，导致头部偏重的问题。HTTP/2.0采用了HPACK算法进行了头部压缩。这一节主要介绍一下HPACK算法。官方文档：<a href="https://www.rfc-editor.org/rfc/rfc7541.txt" target="_blank" rel="noopener">RFC7541</a>。</p>
+<h3 id="HPACK"><a href="#HPACK" class="headerlink" title="HPACK"></a>HPACK</h3><ul>
+<li><p><strong>基本原理：</strong>HPACK 使用2个索引表(静态索引表和动态索引表)来把头部映射到索引值，并对不存在的头部使用哈夫曼编码，并动态缓存到索引，从而达到压缩头部的效果。</p>
+<p>  <img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/hpack.png" alt></p>
+<blockquote>
+<p>从上面看，我们可以看到类似于索引表，每个索引表对应一个值，比如索引为2对应头部中的method头部信息，这样子的话，在传输的时候，不在是传输对应的头部信息了，而是传递索引，对于之前出现过的头部信息，只需要把<strong>「索引」</strong>(比如1，2，…)传给对方即可，对方拿到索引查表就行了。</p>
+</blockquote>
+</li>
+<li><p>静态索引表：定义在RFC中的固定头部，当发送的值符合索引表时，只需要发送索引值就行。比如<code>2 :method GET</code>和<code>3 :method POST</code>是静态表中的两个字段，这样请求的方式如果是<code>GET</code>就可以只发送索引2。</p>
+</li>
+<li><p>动态索引表：动态表是一个由先进先出的队列维护的有空间限制的表，里面同样维护的是头部与对应的索引。<strong>每个动态表只针对一个TCP连接，也就是说每个TCP连接压缩解压缩的上下文中有且只有一个动态表。</strong>当一个头部没有出现过的时候，会把他插入动态表中，下次同名的值就可能会在表中查到到索引并替换掉头部。动态表初始为空。</p>
+</li>
+</ul>
+<h2 id="多路复用"><a href="#多路复用" class="headerlink" title="多路复用"></a>多路复用</h2><p>HTTP/1.x中，如果想并发多个请求需要建立多个TCP连接，且浏览器为了控制资源，还会对单个域名有 6-8个的TCP连接请求限制。</p>
+<p>HTTP/2.0：</p>
+<ul>
+<li><p>同域名的所有通信在单个连接上完成</p>
+</li>
+<li><p>单个通信可以承载任意数量的双向数据流</p>
+</li>
+<li><p>数据流以消息的形式发送，而消息又由一个或多个帧组成，多个帧之间可以乱序发送，根据帧首部的流标识重新组装，也就是<code>Stream ID</code>，这个标识符标志了这个帧是属于哪一条消息的，通过这个标识符，接收方就可以从乱序的二进制帧中选择ID相同的帧，按照顺序进行组装成一个报文。</p>
+</li>
+<li><p>这里要注意一下，TCP是字节有序的协议，所有报文之间必须顺序传送，<strong>同一个报文的帧也是顺序传送的</strong>，但是不同报文的帧可以交错，如下图：</p>
+<p>  <img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/多路复用.png" alt></p>
+</li>
+</ul>
+<h2 id="服务器推送"><a href="#服务器推送" class="headerlink" title="服务器推送"></a>服务器推送</h2><p>浏览器发送一个请求，服务器主动向浏览器推送与这个请求相关的资源（发送多个响应），这样浏览器就不用发起后续请求。</p>
+<p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/服务器推送.png" alt></p>
+<blockquote>
+<p>HTTP/2 打破了严格的请求-响应语义，支持一对多和服务器发起的推送工作流，在浏览器内外开启了全新的互动可能性。 这是一项使能功能，对我们思考协议、协议用途和使用方式具有重要的长期影响。</p>
+</blockquote>
+<p>​        为什么在浏览器中需要一种此类机制呢？一个典型的网络应用包含多种资源，客户端需要检查服务器提供的文档才能逐个找到它们。 那为什么不让服务器提前推送这些资源，从而减少额外的延迟时间呢？ 服务器已经知道客户端下一步要请求什么资源，这时候服务器推送即可派上用场。</p>
+<p><strong>优势：</strong></p>
+<ul>
+<li>推送资源可以由不同页面共享</li>
+<li>服务器可以按照优先级推送资源</li>
+<li>客户端可以缓存推送的资源</li>
+<li>客户端可以拒收推送过来的资源</li>
+</ul>
+<h2 id="二进制分帧"><a href="#二进制分帧" class="headerlink" title="二进制分帧"></a>二进制分帧</h2><p>以前的版本都是明文传输，不利于计算机解析。HTTP/2.0采用二进制格式，全部传输01串，便于计算机解码。</p>
+<p>这样子，一个报文就被拆分成一个个二进制帧，用<strong>Headers帧</strong>存放头部字段，<strong>Data帧</strong>存放请求体数据。</p>
+<h3 id="数据流-消息-帧"><a href="#数据流-消息-帧" class="headerlink" title="数据流 消息 帧"></a>数据流 消息 帧</h3><p>这里简单解释一下数据流，消息和帧的概念：</p>
+<ul>
+<li>数据流：已建立的连接内的双向字节流，可以承载一条或多条消息。</li>
+<li>消息：与逻辑请求或响应消息对应的完整的一系列帧。</li>
+<li>帧：HTTP/2 通信的最小单位，每个帧都包含帧头，至少也会标识出当前帧所属的数据流。</li>
+</ul>
+<p>这些概念的总结如下：</p>
+<ul>
+<li>所有通信都在一个TCP连接上完成，此连接可以承载任意数量的双向字节流。</li>
+<li>每个数据流都有唯一的标识符和可选的优先级信息，用于承载双向消息。</li>
+<li>每条消息都是一条逻辑HTTP消息（请求或者响应），包含一个或多个帧</li>
+<li>帧是最小的通信单位，承载着特定类型的数据，例如 HTTP 标头、消息负载等等。 来自不同数据流的帧可以交错发送，然后再根据每个帧头的数据流标识符重新组装（所谓乱序）。</li>
+</ul>
+<h3 id="乱序帧的组装"><a href="#乱序帧的组装" class="headerlink" title="乱序帧的组装"></a>乱序帧的组装</h3><ul>
+<li><strong>所谓的乱序，指的是不同ID的Stream是乱序的，对于同一个<code>Stream ID</code>的帧是按顺序传输的。</strong>（不厌其烦地再解释一遍）</li>
+<li>接受方收到二进制帧之后，把相同<code>Stream ID</code>的帧组装成完整的请求报文或响应报文。</li>
+<li>二进制帧中有一些字段，控制着<code>优先级</code>和<code>流量控制</code>等功能，这样子的话，就可以设置数据帧的优先级，让服务器处理重要资源，优化用户体验。</li>
+</ul>
+<h1 id="HTTP常见状态码"><a href="#HTTP常见状态码" class="headerlink" title="HTTP常见状态码"></a>HTTP常见状态码</h1><p>RFC定义了HTTP的状态码为三位数，第一个数字为响应的类别，一共分为五类。</p>
+<ul>
+<li><strong>1XX：</strong>代表请求已接受，需要后续处理</li>
+<li><strong>2XX：</strong>表示成功</li>
+<li><strong>3XX：</strong>重定向状态</li>
+<li><strong>4XX：</strong>客户端错误</li>
+<li><strong>5XX：</strong>服务端错误</li>
+</ul>
+<h2 id="2XX-成功"><a href="#2XX-成功" class="headerlink" title="2XX 成功"></a>2XX 成功</h2><ul>
+<li><strong>200 OK</strong>：表示客户端的请求在服务端被正确请求。</li>
+<li>204 No Content：表示请求成功，但是没有资源返回。</li>
+<li>206 Paritial Content：表示客户端进行了范围请求，服务端成功执行了这部分的请求。响应报文中包含由<code>Content Range</code>指定范围的实体内容。</li>
+</ul>
+<h2 id="3XX-重定向"><a href="#3XX-重定向" class="headerlink" title="3XX 重定向"></a>3XX 重定向</h2><ul>
+<li><strong>301 moved permanently：</strong>永久重定向，表示资源已被分配了新的URL，这时应该按 Location 首部字段提示的 URL 重新访问。</li>
+<li><strong>302 found：</strong>临时重定向，表示资源被临时分配了新的URL。</li>
+<li>303 see other：表示资源存在着另一个URL，应使用GET方法获取资源。</li>
+<li>304 not modified，当协商缓存命中时会返回这个状态码。</li>
+<li>307 temporary redirect，临时重定向，和302含义相同,不会改变method</li>
+</ul>
+<blockquote>
+<ol>
+<li><p>当 301、302、303 响应状态码返回时，几乎所有的浏览器都会把 POST 改成 GET，并删除请求报文内的主体，之后请求会自动再次发送</p>
+</li>
+<li><p>301、302 标准是禁止将 POST 方法改变成 GET 方法的，但实际使用时大家都会这么做</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="4XX-客户端错误"><a href="#4XX-客户端错误" class="headerlink" title="4XX 客户端错误"></a>4XX 客户端错误</h2><ul>
+<li><p>400 bad request：请求报文存在语法错误。</p>
+</li>
+<li><p>401 unauthorized：表示发送的请求需要有通过HTTP认证的认证信息。</p>
+</li>
+<li><p>403 forbidden：表示请求资源的请求被服务器拒绝。</p>
+</li>
+<li><p>404 not fond：表示在服务器上没有找到相应的资源。</p>
+</li>
+<li><p>405 Method Not Allowed：服务器禁止使用该方法，客户端可以通过options方法来查看服务器允许的访问方法，如下 ：</p>
+  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Access-Control-Allow-Methods →GET,HEAD,PUT,PATCH,POST,DELETE</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="5XX-服务器错误"><a href="#5XX-服务器错误" class="headerlink" title="5XX 服务器错误"></a>5XX 服务器错误</h2><ul>
+<li>500 internal sever error：表示服务端在执行请求时出现了错误。</li>
+<li>502 Bad Gateway：服务器自身是正常的，访问的时候出了问题，具体啥错误我们不知道。</li>
+<li>503 service unavailable，表明服务器暂时处于超负载或正在停机维护，无法处理请求。</li>
+</ul>
+<h1 id="HTTP缓存"><a href="#HTTP缓存" class="headerlink" title="HTTP缓存"></a>HTTP缓存</h1><h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><ul>
+<li>缓解服务器的压力</li>
+<li>降低客户端获取资源的速度：缓存一般存在在内存中，而且缓存服务器可能比源服务器更近一点（浏览器缓存）。</li>
+</ul>
+<h2 id="储存位置"><a href="#储存位置" class="headerlink" title="储存位置"></a>储存位置</h2><ul>
+<li>代理服务器进行缓存</li>
+<li>客户端浏览器进行缓存</li>
+</ul>
+<h2 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h2><p>浏览器在请求资源时会先判断有没有命中强缓存。HTTP/1.0 版本用<code>Expires</code>字段来控制强缓存，HTTP/1.1 版本使用<code>Cache-Control</code>来控制。</p>
+<h3 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h3><p>　　设置缓存的过期时间，这个时间是针对服务器时间而言的，存在于服务器返回的响应头中，在这个过期时间内可以使用缓存，不需要再次请求。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Expires:Mon, 29 Jun 2029 11:10:23 GMT <span class="comment"># 过期时间为2029年06月29日</span></span><br></pre></td></tr></table></figure>
+<p>　　可以注意到，浏览器的时间和服务器的时间可能不一致，因此在HTTP/1.1中用新的字段<code>Cache-Control</code></p>
+<h3 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h3><p>　　<code>Cache-Control</code>通过设置<code>Max-Age</code>来设置缓存的过期时间。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Cache-Control:max-age=6000 <span class="comment"># 6000秒后过期</span></span><br></pre></td></tr></table></figure>
+<p><strong>注意：</strong></p>
+<ul>
+<li><p>当<code>Expires</code>和<code>Cache-Control</code>同时存在时，优先考虑Cache-Control。</p>
+</li>
+<li><p>当然了，当缓存资源失效了，也就是没有命中强缓存，接下来就进入协商缓存</p>
+</li>
+</ul>
+<h2 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h2><p> 　　强缓存失效后，浏览器在请求头中携带响应的<code>缓存Tag</code>来向服务器发送请求，服务器根据对应的tag，<strong>来决定是否使用缓存</strong>。Tag分为两种，<code>Last Modified</code>和<code>ETag</code>。如果两种方式都支持的话，服务器会优先考虑<code>ETag</code>。</p>
+<h3 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last Modified"></a>Last Modified</h3><p>　　这个字段表示最后修改时间，当浏览器给服务器第一次发请求后，服务器会在响应头中加上这个字段。浏览器接收到这个请求后，如果<strong>再次发起请求</strong>，会在请求头中携带<code>IF-Modified-Since</code>字段，这个字段值就是服务器传来的最后修改时间。服务器拿到<code>IF-Modified-Since</code>字段后，<strong>会与服务器资源目前最新修改的时间最对比</strong>：</p>
+<ul>
+<li>如果<code>IF-Modified-Since</code>比最新修改的时间要小，也就是说服务器资源更新了，那么就会返回新的资源。</li>
+<li>如果相等，则说明资源没有修改，那么返回304，告诉浏览器直接用缓存。</li>
+</ul>
+<h3 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h3><p>　　ETag是服务器根据当前文件的内容，对文件生成唯一的标识，比如MD5算法，只要里面的内容有改动，这个值就会修改，<strong>服务器通过把响应头把该字段给浏览器</strong>。浏览器接收到Tag值，会在下次请求中把这个值放到<code>IF-None-Match</code>字段里发个服务器。服务器拿到这个值后，和最新资源的ETag做对比：</p>
+<ul>
+<li>相等，返回304</li>
+<li>否则，返回新的资源</li>
+</ul>
+<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><ul>
+<li><p>性能上，<code>Last-Modified</code>优于<code>ETag</code>，<code>Last-Modified</code>记录的是时间点，而<code>Etag</code>需要根据文件的MD5算法生成对应的hash值。</p>
+</li>
+<li><p>精度上，<code>ETag</code>优于<code>Last-Modified</code>。<code>ETag</code>按照内容给资源带上标识，能准确感知资源变化，<code>Last-Modified</code>在某些场景并不能准确感知变化，比如：</p>
+<ul>
+<li>编辑了资源文件，但是文件内容并没有更改，这样也会造成缓存失效。</li>
+<li>Last-Modified 能够感知的单位时间是秒，如果文件在 1 秒内改变了多次，那么这时候的 Last-Modified 并没有体现出修改了。</li>
+</ul>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li><p>首先检查<code>Cache-Control</code>， 看强缓存是否可用</p>
+</li>
+<li><p>如果可用的话，直接使用</p>
+</li>
+<li><p>否则进入协商缓存，发送HTTP请求，服务器通过请求头中的<code>If-Modified-Since</code>或者<code>If-None-Match</code>字段检查资源是否更新</p>
+</li>
+<li><p>资源更新，返回资源和200状态码。</p>
+</li>
+<li><p>否则，返回304，直接告诉浏览器直接从缓存中去资源。</p>
+</li>
+</ol>
+<h1 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h1><h2 id="和HTTP的区别"><a href="#和HTTP的区别" class="headerlink" title="和HTTP的区别"></a>和HTTP的区别</h2><p>　　HTTPS相比HTTP就是多了一个安全性的概念，实际上，HTTPS并不是一个全新的应用层协议，它就是<code>HTTP + TLS/SSL</code>，而安全性就是<code>TLS/SSL</code>做的工作。</p>
+<ul>
+<li>SSL（Secure Sockets Layer）：安全套接层</li>
+<li>TLS（Transport Layer Security）：传输层安全，目前使用的版本是1.2</li>
+</ul>
+<p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/HTTPS.png" alt></p>
+<p>主要有如下区别：</p>
+<ul>
+<li>HTTP 是明文传输协议，HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，比 HTTP 协议安全。</li>
+<li>HTTPS比HTTP更加安全，对搜索引擎更友好，利于SEO,谷歌、百度优先索引HTTPS网页。</li>
+<li>HTTPS标准端口443，HTTP标准端口80。</li>
+<li>HTTPS需要用到SSL证书，而HTTP不用。</li>
+</ul>
+<p><strong>HTTPS有两点关键的作用：</strong></p>
+<ul>
+<li>建立信息安全的通道，保证数据传输的安全。</li>
+<li>对网站服务其进行真实身份验证。</li>
+</ul>
+<h2 id="HTTPS工作原理"><a href="#HTTPS工作原理" class="headerlink" title="HTTPS工作原理"></a>HTTPS工作原理</h2><p>工作原理就是过了一层<code>SSL/TCL</code>连接。</p>
+<blockquote>
+<p>TLS/SSL 的功能实现主要依赖于三类基本算法：<code>散列函数</code> 、<code>对称加密</code>和<code>非对称加密</code>。</p>
+<ul>
+<li>非对称加密实现身份认证和密钥协商</li>
+<li>对称加密算法采用协商的密钥对数据加密</li>
+<li>散列函数验证信息的完整性。</li>
+</ul>
+</blockquote>
+<h3 id="对称加密"><a href="#对称加密" class="headerlink" title="对称加密"></a>对称加密</h3><p>　　对称加密就是指客户端和服务端使用同一个密钥来加密明文。</p>
+<p>　　但是不同的客户端密钥肯定不同，服务器要和客户端拥有相同的密钥就需要把密钥从客户端通过HTTP传输过来，这样密钥就会被拦截，很不安全。但是如果这个密钥别人获取不到，那么就是安全的。</p>
+<h3 id="非对称加密TLS-1-2"><a href="#非对称加密TLS-1-2" class="headerlink" title="非对称加密TLS 1.2"></a>非对称加密TLS 1.2</h3><p>　　采用的算法是RSA，所以在一些文章中也会看见<strong>传统RSA握手</strong>，基于现在TLS主流版本是1.2，所以接下来梳理的是<strong>TLS/1.2握手过程</strong>。非对称加密需要知道以下要点：</p>
+<ul>
+<li>有一堆密钥，公钥和私钥。</li>
+<li>公钥加密的内容，只有私钥也可以解开，私钥加密的内容，只有公钥可以解开。</li>
+<li>公钥发送给所有客户端，私钥只保存在服务端。</li>
+</ul>
+<h4 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h4><p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/TLS1.2.PNG" alt></p>
+<p><strong>步骤解释：</strong></p>
+<ol>
+<li><p>Client发送一个HTTPS请求，连接443端口。这个请求可以理解成是<strong>请求公钥</strong>。</p>
+</li>
+<li><p>Server端收到请求后通过第三方机构私钥加密，会把数字证书（公钥证书）发给Client。</p>
+</li>
+<li><p>浏览器验证公钥证书</p>
+<ul>
+<li><p>浏览器安装后会自动带一些权威第三方机构公钥，使用匹配的公钥对数字签名进行解密。</p>
+</li>
+<li><p>根据签名生成的规则对网站信息进行本地签名生成，然后两者比对。</p>
+</li>
+<li><p>通过比对两者签名，匹配则说明认证通过，不匹配则获取证书失败。</p>
+</li>
+</ul>
+</li>
+<li><p>在安全拿到<strong>服务器公钥</strong>后，客户端Client随机生成一个<strong>会话密钥</strong>（SessionID），使用<strong>服务器公钥</strong>（证书的公钥）加密这个<strong>对称密钥</strong>，发送给Server(服务器)。</p>
+</li>
+<li><p>Server端用私钥解密得到会话密钥，至此两端都有了一个相同的密钥作为<strong>对称密钥</strong>。</p>
+</li>
+<li><p>两端使用对称密钥对请求的数据进行加密和解密</p>
+</li>
+</ol>
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><p>　　在第二步的时候，我发给Client的公钥证书被劫持且篡改了怎么办？因为证书中有公钥，这个公钥是公开的，如果有中间人替换了这个公钥，Client是感知不到的。</p>
+<p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/公钥劫持.png" alt></p>
+<h2 id="第三方认证"><a href="#第三方认证" class="headerlink" title="第三方认证"></a>第三方认证</h2><p>如果只用非对称加密，一旦证书被劫持，Client感知不到。如果让Cilent可以感知呢？</p>
+<h3 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h3><p>在HTTPS中，通过”<strong>证书 + 数字签名</strong>”来解决这个问题。</p>
+<p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/数字签名.png" alt></p>
+<p>　　可以看到，数字签名是单独加密的：<strong>使用第三方认证机构的私钥。</strong></p>
+<p>　　如果证书再被劫持，把服务器的公钥替换成假的公钥，因为有数字签名的存在，客户端会发现数字签名不匹配。因为数字签名有第三方的私钥加密，这个私钥中间人是不知道的。<font color="red">数字签名用<strong>散列函数</strong>计算了<strong>公钥证书</strong>中部分信息</font>，如果中间人修改了公钥证书，客户端解开数字签名后，内容就会不匹配，这就保证了可靠性。</p>
+<h3 id="客户端如果对比数字签名？"><a href="#客户端如果对比数字签名？" class="headerlink" title="客户端如果对比数字签名？"></a>客户端如果对比数字签名？</h3><ol>
+<li>浏览器会去安装一些比较权威的第三方认证机构的公钥，比如VeriSign、Symantec以及GlobalSign等等。</li>
+<li>验证数字签名的时候，会直接从本地拿到相应的第三方的公钥，对私钥加密后的数字签名进行解密得到真正的签名。</li>
+<li>然后客户端利用签名生成规则（这里具体的规则就不讲了，散列函数只是一种）进行签名生成，看两个签名是否匹配，如果匹配认证通过，不匹配则获取证书失败。</li>
+</ol>
+<h2 id="SSL断开后如何恢复？"><a href="#SSL断开后如何恢复？" class="headerlink" title="SSL断开后如何恢复？"></a>SSL断开后如何恢复？</h2><p>　　可以看到，HTTPS建立连接十分麻烦，且十分耗时。有两种方式可以快速的恢复SSL连接，一种是使用SessionID，另一种是Session Ticket。</p>
+<h3 id="SessionID"><a href="#SessionID" class="headerlink" title="SessionID"></a>SessionID</h3><p>　　使用 session ID 的方式，每一次的会话都有一个编号，当对话中断后，下一次重新连接时，只要客户端给出这个编号，服务器如果有这个编号的记录，那么双方就可以继续使用以前的秘钥，而不用重新生成一把。目前所有的浏览器都支持这一种方法。但是这种方法有一个缺点是，session ID 只能够存在一台服务器上，<strong>如果我们的请求通过负载平衡被转移到了其他的服务器上</strong>，那么就无法恢复对话。</p>
+<h3 id="Session-Ticket"><a href="#Session-Ticket" class="headerlink" title="Session Ticket"></a>Session Ticket</h3><p>　　另一种方式是 session ticket 的方式，session ticket 是服务器在上一次对话中发送给客户的，这个 ticket 是加密的，只有服务器能够解密，里面包含了本次会话的信息，比如对话秘钥和加密方法等。这样不管我们的请求是否转移到其他的服务器上，当服务器将 ticket 解密以后，就能够获取上次对话的信息，就不用重新生成对话秘钥了。</p>
+<h1 id="短轮询、长轮询和-WebSocket"><a href="#短轮询、长轮询和-WebSocket" class="headerlink" title="短轮询、长轮询和 WebSocket"></a>短轮询、长轮询和 WebSocket</h1><h2 id="短轮询"><a href="#短轮询" class="headerlink" title="短轮询"></a>短轮询</h2><p><strong>短轮询的基本思路:</strong></p>
+<ul>
+<li>浏览器每隔一段时间向浏览器发送 http 请求，服务器端在收到请求后，不论是否有数据更新，都直接进行 响应。</li>
+<li>这种方式实现的即时通信，本质上还是浏览器发送请求，服务器接受请求的一个过程，通过让客户端不断的进行请求，使得客户端能够模拟实时地收到服务器端的数据的变化。</li>
+</ul>
+<p><strong>优缺点：</strong></p>
+<ul>
+<li>优点是便于理解</li>
+<li>缺点是这种方式由于需要不断的建立 http 连接，严重浪费了服务器端和客户端的资源。当用户增加时，服务器端的压力就会变大，这是很不合理的。</li>
+</ul>
+<h2 id="长轮询"><a href="#长轮询" class="headerlink" title="长轮询"></a>长轮询</h2><p><strong>长轮询的基本思路:</strong></p>
+<ul>
+<li>首先由客户端向服务器发起请求，当服务器收到客户端发来的请求后，服务器端不会直接进行响应，而是先将这个请求挂起，然后判断服务器端数据是否有更新。</li>
+<li>如果有更新，则进行响应，如果一直没有数据，则到达一定的时间限制才返回。客户端 JavaScript 响应处理函数会在处理完服务器返回的信息后，再次发出请求，重新建立连接。</li>
+</ul>
+<p><strong>优缺点：</strong></p>
+<ul>
+<li>长轮询和短轮询比起来，它的优点是<strong>「明显减少了很多不必要的 http 请求次数」</strong>，相比之下节约了资源。</li>
+<li>长轮询的缺点在于，连接挂起也会导致资源的浪费。</li>
+</ul>
+<h2 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h2><ul>
+<li><p>WebSocket 是 Html5 定义的一个新协议，与传统的 http 协议不同，该协议允许由服务器主动的向客户端推送信息。</p>
+</li>
+<li><p>使用 WebSocket 协议的缺点是在服务器端的配置比较复杂。WebSocket 是一个全双工的协议，也就是通信双方是平等的，可以相互发送消息。</p>
+</li>
+</ul>
+<h1 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h1><p>DNS协议提供了一种主机名到IP地址的转换服务，就是我们常说的域名系统。这是应用层的协议，通常该协议建立在UDP之上，这就要求域名解析器和域名服务器都必须自己处理超时和重传来确保可靠性，使用53端口号。有两种情况会建立TCP连接：</p>
+<ul>
+<li>返回的响应超过了512个字节（UDP最多传递512字节）</li>
+<li>区域传送（主域名向辅助域名传送数据）</li>
+</ul>
+<h2 id="查询流程"><a href="#查询流程" class="headerlink" title="查询流程"></a>查询流程</h2><ol>
+<li>客户端不会直接去请求本地DNS服务器，而是通过下图流程一步步查询：</li>
+</ol>
+<p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/客户端请求域名.png" alt></p>
+<ol>
+<li>本地DNS服务器查询IP的过程一般是<strong>递归查询</strong></li>
+</ol>
+<p><img src="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/本地DNS迭代查询.png" alt></p>
+<ol>
+<li><strong>迭代查询：</strong>用户请求DNS服务器后，DNS服务器直接返回结果，如果没有找到域名，则由用户自己发送下一级请求。</li>
+</ol>
+<p>　　可以这么理解：本地服务器看起来自己的请求时递归的，因为我只需要发一次请求，但是本地DNS服务器的请求是迭代的，需要服务器一次次去查询。</p>
+<h2 id="DNS缓存"><a href="#DNS缓存" class="headerlink" title="DNS缓存"></a>DNS缓存</h2><p>　　在一个请求中，当某个DNS服务器收到一个DNS回答后，他能够将回答中的信息存储到本地储存器中。返回资源中的TTL代表该记录的缓存时间。</p>
+<h2 id="DNS为什么要使用UDP？"><a href="#DNS为什么要使用UDP？" class="headerlink" title="DNS为什么要使用UDP？"></a>DNS为什么要使用UDP？</h2><p><strong>「DNS 使用 UDP 协议作为传输层协议的主要原因是为了避免使用 TCP 协议时造成的连接时延。」</strong></p>
+<ul>
+<li>为了得到一个域名的 IP 地址，往往会向多个域名服务器查询，如果使用 TCP 协议，那么每次请求都会存在连接时延，这样使 DNS 服务变得很慢。</li>
+<li>大多数的地址查询请求，都是浏览器请求页面时发出的，这样会造成网页的等待时间过长。</li>
+</ul>
+<h2 id="DNS实现负载均衡"><a href="#DNS实现负载均衡" class="headerlink" title="DNS实现负载均衡"></a>DNS实现负载均衡</h2><p>想不到吧，DNS还能做负载均衡，因为一个域名可能对应不同的ip。</p>
+<ul>
+<li>当用户发起网站域名的 DNS 请求的时候，DNS 服务器返回这个域名所对应的服务器 IP 地址的集合</li>
+<li>在每个回答中，会循环这些 IP 地址的顺序，用户一般会选择排在前面的地址发送请求。</li>
+<li>以此将用户的请求均衡的分配到各个不同的服务器上，这样来实现负载均衡。</li>
+</ul>
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>DNS域名系统是应层的协议，运行在UDP之上，使用端口53</li>
+<li>查询过程，本地查询是递归查询，依次通过 <strong>浏览器缓存—-本地hosts文件—-本地DNS解析器—-本地DNS服务器—-其他域名服务器请求</strong>。 接下来的过程就是迭代过程。</li>
+<li>递归查询一般而言，发送一次请求就够，迭代过程需要用户发送多次请求。</li>
+</ul>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ol>
+<li><a href="https://www.jianshu.com/p/f44b930cfcac" target="_blank" rel="noopener">HPACK完全解析</a></li>
+<li><a href="https://developers.google.com/web/fundamentals/performance/http2/?hl=zh-CN" target="_blank" rel="noopener">HTTP/2简介 Google</a></li>
+<li><a href="https://juejin.im/post/6857287743966281736#heading-59" target="_blank" rel="noopener">「查缺补漏」巩固你的HTTP知识体系</a></li>
+<li><a href="https://github.com/CyC2018/CS-Notes/blob/master/notes/HTTP.md#%E5%85%ADhttps" target="_blank" rel="noopener">CS-NOTE</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>计算机网络</tag>
+        <tag>面试题</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LeetCode题解:39,41,42</title>
     <url>/2020/06/27/LeetCode%E9%A2%98%E8%A7%A3-39-41-42/</url>
     <content><![CDATA[<h1 id="题目名称"><a href="#题目名称" class="headerlink" title="题目名称"></a>题目名称</h1><blockquote>
