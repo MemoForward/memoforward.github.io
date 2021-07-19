@@ -138,10 +138,8 @@
 <td style="text-align:center">对集合类进行排序，传入一个比较器，返回一个流对象</td>
 </tr>
 <tr>
-<td style="text-align:center">`Object[] toArray()</td>
-<td style="text-align:center"></td>
-<td>collect(Collectors.toList())`</td>
-<td>对流进行数组或集合类型的转化</td>
+<td style="text-align:center"><code>Object[] toArray() 和 collect(Collectors.toList())</code></td>
+<td style="text-align:center">对流进行数组或集合类型的转化</td>
 </tr>
 </tbody>
 </table>
