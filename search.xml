@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Java中的继承</title>
+    <url>/2021/07/19/Java%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>本文主要针对一些比较模糊的问题进行总结：</p>
+<ol>
+<li>引用是父类，实例是子类</li>
+<li>super和this</li>
+</ol>
+</blockquote>
+<a id="more"></a>
+<h1 id="父类和子类的引用情况"><a href="#父类和子类的引用情况" class="headerlink" title="父类和子类的引用情况"></a>父类和子类的引用情况</h1><h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><p>　　父类的引用可以指向子类的对象（向上转型），子类引用不能指向父类对象。这个很好理解，子类实例化会执行父类的构造器，此时父类的属性已经在内存中了，使用父类的引用可以访问到父类的属性信息；但是父类实例化不会执行子类的构造器，因此内存中不会有子类的属性信息，使用子类的引用无法访问到子类的成员信息。这里有个口诀对于对象的类型：<strong>编译看左边，运行看右边，静态全看左</strong>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Father f = <span class="keyword">new</span> Son(); <span class="comment">// ok</span></span><br><span class="line">Son s = <span class="keyword">new</span> Father(); <span class="comment">// 编译不通过</span></span><br><span class="line">Son ss = (Son)<span class="keyword">new</span> Father(); <span class="comment">// 编译通过，运行时抛出ClassCastException（类型转换异常）</span></span><br></pre></td></tr></table></figure>
+<p>　　这里比较特殊的是，父类引用指向子类的对象，该引用<strong>只能</strong>调用父类定义的成员变量和成员方法（因为编译看左边），<font color="red"><strong>而在运行中，调用同名的成员变量会调用父类的成员变量，如果调用同名的成员方法，则会调用子类的方法</strong></font>。这里很奇怪，由于运行看右边，为什么我访问的不是子类对象中同名的成员方法呢？</p>
+<p>　　这和Java的运行机制有关，<font color="brown">Java中的<strong>成员变量、静态成员方法、private以及final方法都是静态绑定的</strong>，所谓静态绑定是只在编译期绑定，这时候引用<code>f</code>已经和父类的成员变量绑定了；而<strong>普通的成员方法是动态绑定的</strong>，也就是运行时绑定，此时引用<code>f</code>在调用方法的时候是访问的是子类方法表的地址</font>。也就是说，Java的多态是指在运行时多态，只是指普通成员方法的多态。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String name = <span class="string">"父亲"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Son</span> <span class="keyword">extends</span> <span class="title">Father</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> String name = <span class="string">"儿子"</span>;</span><br><span class="line">    <span class="keyword">public</span> String name2 = <span class="string">"儿子小名"</span></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Father f = <span class="keyword">new</span> Son();</span><br><span class="line">    System.out.println(f.name); <span class="comment">// 父亲</span></span><br><span class="line">    System.out.println(f.getName()); <span class="comment">//儿子</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>　　这里补充一下：虽然引用<code>f</code>无法直接调用子类的成员变量和父类没有成员方法，但是在运行时，这些属性仍然是开辟了空间的，但是无法访问（主要是因为编译不过）。这里给出一个验证，我们知道反射是典型的在运行时可以操作对象的方式，这里通过反射在运行时强行去找<code>f</code>的成员变量，可以看到实际上<code>f</code>在运行时其实是一个子类的对象，通过反射可以访问到父类没有的变量或者方法，但是因为静态绑定了，所以直接通过<code>f.name</code>显示的是父亲的<code>name</code>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Father f = <span class="keyword">new</span> Son();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Field field = f.getClass().getField(<span class="string">"name"</span>);</span><br><span class="line">        Field field2 = f.getClass().getField(<span class="string">"name2"</span>);</span><br><span class="line">        System.out.println(f.name); <span class="comment">// 父亲</span></span><br><span class="line">        System.out.println(f.getName()); <span class="comment">// 儿子</span></span><br><span class="line">        String name = (String)field.get(f); <span class="comment">// 儿子</span></span><br><span class="line">        String name2 = (String)field2.get(f); <span class="comment">// 儿子小名</span></span><br><span class="line">        System.out.println(name);</span><br><span class="line">        System.out.println(name2);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Super和This"><a href="#Super和This" class="headerlink" title="Super和This"></a>Super和This</h1><p>　　大家都知道两点：</p>
+<ol>
+<li>子类初始化会调用父类的构造器</li>
+<li>子类中使用super可以调用父类的变量和方法（除了<code>private</code>修饰的）</li>
+</ol>
+<p>　　但是这里要强调一下，<font color="red"><strong>子类实例化不会创建父类的实例</strong></font>，调用父类的构造器只是在内存中开辟了父类属性的空间，也就是说和<code>this</code>不同，<code>super</code>并不指代一个对象。如果调用<code>super.hashcode()</code>就会发现结果和<code>this.hashcode()</code>的值一样，因为根本就没有父类对象，调用父类的<code>hashcode</code>和子类的<code>hashcode</code>得到的都是子类的<code>hashcode</code>，从这可以推导得出，就算是在父类的构造器中调用<code>this.hashcode()</code>得到的也是子类的<code>hashcode</code>。</p>
+<p>　　<strong>总结一下</strong>就是：<code>super</code>只是一个标志，不指向任何对象，它能调用父类的构造器和方法，并不是说指向了父类对象，因为根本没有父类对象被创建。</p>
+<p>　　另外，<code>hashcode</code>方法是运行时调用的，因此上述的结论和引用是不是子类类型并无关系。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 重写Son和Father</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Father</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"父类this.hashcode(): "</span> + <span class="keyword">this</span>.hashCode());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Son</span> <span class="keyword">extends</span> <span class="title">Father</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Son</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"子类this.hashcode(): "</span> + <span class="keyword">this</span>.hashCode());</span><br><span class="line">        System.out.println(<span class="string">"子类super.hashcode(): "</span> + <span class="keyword">super</span>.hashCode());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 验证</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Son s = <span class="keyword">new</span> Son();</span><br><span class="line">    System.out.println(<span class="string">"==========="</span>);</span><br><span class="line">    Father f = <span class="keyword">new</span> Son();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 结果</span></span><br><span class="line">父类<span class="keyword">this</span>.hashcode(): <span class="number">1554874502</span></span><br><span class="line">子类<span class="keyword">this</span>.hashcode(): <span class="number">1554874502</span></span><br><span class="line">子类<span class="keyword">super</span>.hashcode(): <span class="number">1554874502</span></span><br><span class="line">===========</span><br><span class="line">父类<span class="keyword">this</span>.hashcode(): <span class="number">1846274136</span></span><br><span class="line">子类<span class="keyword">this</span>.hashcode(): <span class="number">1846274136</span></span><br><span class="line">子类<span class="keyword">super</span>.hashcode(): <span class="number">1846274136</span></span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>　　Java继承主要就是要处理两个问题：一、什么东西是静态绑定的；二、子类实例化，会不会实例化一个父类？懂了这两个问题，所有问题都能推导出来。</p>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+        <tag>Java基础</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java8特性lambda表达式笔记</title>
     <url>/2021/07/19/Java8%E7%89%B9%E6%80%A7lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
@@ -64,7 +98,7 @@
 </tr>
 <tr>
 <td style="text-align:center"><code>Supplier&lt;T&gt;</code></td>
-<td style="text-align:center">T get()</td>
+<td style="text-align:center"><code>T get()</code></td>
 <td style="text-align:center">表示”生产者”，不接收参数，返回一个值</td>
 </tr>
 <tr>
@@ -80,7 +114,7 @@
 </tbody>
 </table>
 </div>
-<p>　　这里写个简单的例子，这些接口一般会经常用在<code>Stream</code>里，下一章我解析一些流操作的源码，这里写个简单的方便理解。</p>
+<p>　　这里写个简单的例子，这些接口一般会经常用在<code>Stream</code>里，下一章会介绍这些方法的具体应用，这里写个简单的，方便理解。<font color="red"><strong>下列方法一个重要的理解方式就是：入参函数使用了另一个入参作为了参数，类方法又调用了入参函数。</strong></font></p>
 <ul>
 <li>定义一个类，使用上述接口作为参数</li>
 </ul>
