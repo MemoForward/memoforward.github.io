@@ -1587,20 +1587,128 @@
 </table>
 </div>
 <ol>
-<li><p><strong>事务1</strong>修改了这行的所有内容，首先会给这行数据加写锁：</p>
-<p> | 字段1 | 字段2 | 字段3 | 字段4 | 字段5 | 主键id | trx_id | roll_pt |<br> | :—-: | :—-: | :—-: | :—-: | :—-: | :——: | :——: | :——-: |<br> |  10   |  20   |  30   |  40   |  50   |   01   |   01   |    1    |</p>
-<p> 生成一个undo日志1，<strong>该数据行的<code>roll_pt</code>会指向undo日志1的<code>主键id</code>上</strong>，而undo日志保留了初始数据行的状态：</p>
-<p> <strong>undo日志1：</strong></p>
-<p> | 字段1 | 字段2 | 字段3 | 字段4 | 字段5 | 主键id | trx_id | roll_pt |<br> | :—-: | :—-: | :—-: | :—-: | :—-: | :——: | :——: | :——-: |<br> |   1   |   2   |   3   |   4   |   5   |   01   |   00   |  Null   |</p>
-</li>
-<li><p>事务一提交，释放写锁，<strong>事务二</strong>进行了修改: </p>
-<p> | 字段1 | 字段2 | 字段3 | 字段4 | 字段5 | 主键id | trx_id | roll_pt |<br> | :—-: | :—-: | :—-: | :—-: | :—-: | :——: | :——: | :——-: |<br> |  11   |  21   |  31   |  41   |  51   |   01   |   02   |    2    |</p>
-<p> 此时会生成一个<strong>undo日志2</strong>保存事务二修改前的状态，该数据行的<code>roll_pt</code>指向undo日志2的主键id上：</p>
-<p> <strong>undo日志2</strong>：</p>
-<p> | 字段1 | 字段2 | 字段3 | 字段4 | 字段5 | 主键id | trx_id | roll_pt |<br> | :—-: | :—-: | :—-: | :—-: | :—-: | :——: | :——: | :——-: |<br> |  10   |  20   |  30   |  40   |  50   |   01   |   01   |    1    |</p>
-<p> 由于undo日志1的值不会立即被删除，因此<strong>undo日志2的<code>roll_pt</code>会指向undo日志1的<code>主键id</code>上，形成一条版本链。</strong></p>
-</li>
+<li>事务1修改了这行的所有内容，首先会给这行数据加写锁：</li>
 </ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段1</th>
+<th style="text-align:center">字段2</th>
+<th style="text-align:center">字段3</th>
+<th style="text-align:center">字段4</th>
+<th style="text-align:center">字段5</th>
+<th style="text-align:center">主键id</th>
+<th style="text-align:center">trx_id</th>
+<th style="text-align:center">roll_pt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">30</td>
+<td style="text-align:center">40</td>
+<td style="text-align:center">50</td>
+<td style="text-align:center">01</td>
+<td style="text-align:center">01</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>生成一个undo日志1，<strong>该数据行的<code>roll_pt</code>会指向undo日志1的<code>主键id</code>上</strong>，而undo日志保留了初始数据行的状态：</p>
+<p><strong>undo日志1：</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段1</th>
+<th style="text-align:center">字段2</th>
+<th style="text-align:center">字段3</th>
+<th style="text-align:center">字段4</th>
+<th style="text-align:center">字段5</th>
+<th style="text-align:center">主键id</th>
+<th style="text-align:center">trx_id</th>
+<th style="text-align:center">roll_pt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">01</td>
+<td style="text-align:center">00</td>
+<td style="text-align:center">Null</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol>
+<li>事务一提交，释放写锁，事务二进行了修改: </li>
+</ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段1</th>
+<th style="text-align:center">字段2</th>
+<th style="text-align:center">字段3</th>
+<th style="text-align:center">字段4</th>
+<th style="text-align:center">字段5</th>
+<th style="text-align:center">主键id</th>
+<th style="text-align:center">trx_id</th>
+<th style="text-align:center">roll_pt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center">21</td>
+<td style="text-align:center">31</td>
+<td style="text-align:center">41</td>
+<td style="text-align:center">51</td>
+<td style="text-align:center">01</td>
+<td style="text-align:center">02</td>
+<td style="text-align:center">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>此时会生成一个<strong>undo日志2</strong>保存事务二修改前的状态，该数据行的<code>roll_pt</code>指向undo日志2的主键id上：</p>
+<p><strong>undo日志2</strong>：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段1</th>
+<th style="text-align:center">字段2</th>
+<th style="text-align:center">字段3</th>
+<th style="text-align:center">字段4</th>
+<th style="text-align:center">字段5</th>
+<th style="text-align:center">主键id</th>
+<th style="text-align:center">trx_id</th>
+<th style="text-align:center">roll_pt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">30</td>
+<td style="text-align:center">40</td>
+<td style="text-align:center">50</td>
+<td style="text-align:center">01</td>
+<td style="text-align:center">01</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>由于undo日志1的值不会立即被删除，因此<strong>undo日志2的<code>roll_pt</code>会指向undo日志1的<code>主键id</code>上，形成一条版本链。</strong></p>
 <h4 id="ReadView"><a href="#ReadView" class="headerlink" title="ReadView"></a>ReadView</h4><p>MVCC中进行快照读的基准是ReadView。执行<code>select</code>操作，可能会创建一个ReadView（依赖于隔离级别），ReadView保存着系统中所有未提交事务的<code>trx_id</code>。</p>
 <div class="table-container">
 <table>
