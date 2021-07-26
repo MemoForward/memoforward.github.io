@@ -1634,7 +1634,7 @@
 <li>TRX_ID_MIN &lt; trx_id &lt; TRX_ID_MAX：如果trx_id不在readview里，表示生成该版本号的事务已经提交， 可以读取数据；否则，说明未提交，这就不可以读了。</li>
 </ul>
 <p>补充：如果出现不可读的情况，将会沿着undo日志通过版本链查找最新可用的版本号进行读取。</p>
-<h1 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h1><h2 id="读未提交（Read-Uncommited）"><a href="#读未提交（Read-Uncommited）" class="headerlink" title="读未提交（Read Uncommited）"></a>读未提交（Read Uncommited）</h2><p>顾名思义，可以读到其他事务未提交的数据。这种隔离级别是<strong>不加锁的</strong>，效率最高，也不用MVCC。</p>
+<h1 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h1><h1 id="事务的隔离级别"><a href="#事务的隔离级别" class="headerlink" title="事务的隔离级别"></a>事务的隔离级别</h1><h2 id="读未提交（Read-Uncommited）"><a href="#读未提交（Read-Uncommited）" class="headerlink" title="读未提交（Read Uncommited）"></a>读未提交（Read Uncommited）</h2><p>顾名思义，可以读到其他事务未提交的数据。这种隔离级别是<strong>不加锁的</strong>，效率最高，也不用MVCC。</p>
 <h2 id="读已提交（Read-Commited）"><a href="#读已提交（Read-Commited）" class="headerlink" title="读已提交（Read Commited）"></a>读已提交（Read Commited）</h2><p>事务提交后，可以被其他事务读取。但是事务B在两次读取的时间间隔内，事务A提交了修改，则事务B两次读取的数据就会不一样，这就是”不可重复读“的问题。</p>
 <h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><p>事务A在修改数据的时候加写锁，直到事务结束。</p>
 <p>此时这种解决方法会遇到一个问题：<strong>其他事务想要读数据时，会等待锁的释放。</strong></p>
