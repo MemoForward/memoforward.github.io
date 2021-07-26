@@ -28,7 +28,7 @@
 <meta property="og:description" content="前言  事务的特性 MySQL隔离级别">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-12-15T03:19:09.000Z">
-<meta property="article:modified_time" content="2021-07-26T02:09:29.666Z">
+<meta property="article:modified_time" content="2021-07-26T02:10:58.590Z">
 <meta property="article:author" content="MemoForward">
 <meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
@@ -219,7 +219,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-26 10:09:29" itemprop="dateModified" datetime="2021-07-26T10:09:29+08:00">2021-07-26</time>
+                <time title="修改时间：2021-07-26 10:10:58" itemprop="dateModified" datetime="2021-07-26T10:10:58+08:00">2021-07-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -294,7 +294,7 @@
 </li>
 <li><p><strong>事务1</strong>修改了这行的所有内容，首先会给这行数据加写锁：</p>
 <p> | 字段1 | 字段2 | 字段3 | 字段4 | 字段5 | 主键id | trx_id | roll_pt |<br> | :—-: | :—-: | :—-: | :—-: | :—-: | :——: | :——: | :——-: |<br> |  10   |  20   |  30   |  40   |  50   |   01   |   01   |    1    |</p>
-<p> 生成一个undo日志1，<font color="red">该数据行的<code>roll_pt</code>会指向undo日志1的<code>主键id</code>上</font>，而undo日志保留了初始数据行的状态：</p>
+<p> 生成一个undo日志1，<strong>该数据行的<code>roll_pt</code>会指向undo日志1的<code>主键id</code>上</strong>，而undo日志保留了初始数据行的状态：</p>
 <p> <strong>undo日志1：</strong></p>
 <p> | 字段1 | 字段2 | 字段3 | 字段4 | 字段5 | 主键id | trx_id | roll_pt |<br> | :—-: | :—-: | :—-: | :—-: | :—-: | :——: | :——: | :——-: |<br> |   1   |   2   |   3   |   4   |   5   |   01   |   00   |  Null   |</p>
 </li>
