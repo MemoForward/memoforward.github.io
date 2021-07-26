@@ -1586,9 +1586,7 @@
 </tbody>
 </table>
 </div>
-<ol>
-<li>事务1修改了这行的所有内容，首先会给这行数据加写锁：</li>
-</ol>
+<p>2.事务1修改了这行的所有内容，首先会给这行数据加写锁：</p>
 <div class="table-container">
 <table>
 <thead>
@@ -1647,9 +1645,7 @@
 </tbody>
 </table>
 </div>
-<ol>
-<li>事务一提交，释放写锁，事务二进行了修改: </li>
-</ol>
+<p>3.事务一提交，释放写锁，事务二进行了修改: </p>
 <div class="table-container">
 <table>
 <thead>
