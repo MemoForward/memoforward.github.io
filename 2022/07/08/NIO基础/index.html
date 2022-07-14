@@ -20,33 +20,37 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":5,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="一个温柔又专情的闷骚之人">
-<meta property="og:type" content="website">
-<meta property="og:title" content="MemoForward&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="NIO基础引言目前互联网环境下，分布式系统十分重要，而分布式的根基在于网络编程。Netty是java领域网络编程的佼佼者。而要学好Netty，首先就必须要会NIO编程。本笔记旨在学习NIO的概念、使用及原理，并附带一些代码实现。 概念NIO：non-blocking io 非阻塞IO。NIO有三大组件：Channel，Bugger， Selector。 三大组件Channel &amp;&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NIO基础">
+<meta property="og:url" content="http://yoursite.com/2022/07/08/NIO%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="MemoForward&#39;s Blog">
-<meta property="og:description" content="一个温柔又专情的闷骚之人">
+<meta property="og:description" content="NIO基础引言目前互联网环境下，分布式系统十分重要，而分布式的根基在于网络编程。Netty是java领域网络编程的佼佼者。而要学好Netty，首先就必须要会NIO编程。本笔记旨在学习NIO的概念、使用及原理，并附带一些代码实现。 概念NIO：non-blocking io 非阻塞IO。NIO有三大组件：Channel，Bugger， Selector。 三大组件Channel &amp;&amp;">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/2022/07/08/NIO%E5%9F%BA%E7%A1%80/NIO%E6%B6%88%E6%81%AF%E8%BE%B9%E7%95%8C.png">
+<meta property="article:published_time" content="2022-07-08T15:26:25.000Z">
+<meta property="article:modified_time" content="2022-07-14T17:02:32.740Z">
 <meta property="article:author" content="MemoForward">
 <meta property="article:tag" content="“Java">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="框架">
 <meta property="article:tag" content="机器学习”">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2022/07/08/NIO%E5%9F%BA%E7%A1%80/NIO%E6%B6%88%E6%81%AF%E8%BE%B9%E7%95%8C.png">
 
-<link rel="canonical" href="http://yoursite.com/">
+<link rel="canonical" href="http://yoursite.com/2022/07/08/NIO%E5%9F%BA%E7%A1%80/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false
+    isHome : false,
+    isPost : true
   };
 </script>
 
-  <title>MemoForward's Blog</title>
+  <title>NIO基础 | MemoForward's Blog</title>
   
 
 
@@ -186,10 +190,10 @@
             
 
   <div class="posts-expand">
-        
+      
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/07/08/NIO%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -203,8 +207,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/07/08/NIO%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">NIO基础</a>
+          NIO基础
         </h1>
 
         <div class="post-meta">
@@ -235,7 +238,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="NIO基础"><a href="#NIO基础" class="headerlink" title="NIO基础"></a>NIO基础</h1><h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>目前互联网环境下，分布式系统十分重要，而分布式的根基在于网络编程。Netty是java领域网络编程的佼佼者。而要学好Netty，首先就必须要会NIO编程。本笔记旨在学习NIO的概念、使用及原理，并附带一些代码实现。</p>
+        <h1 id="NIO基础"><a href="#NIO基础" class="headerlink" title="NIO基础"></a>NIO基础</h1><h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>目前互联网环境下，分布式系统十分重要，而分布式的根基在于网络编程。Netty是java领域网络编程的佼佼者。而要学好Netty，首先就必须要会NIO编程。本笔记旨在学习NIO的概念、使用及原理，并附带一些代码实现。</p>
 <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>NIO：non-blocking io 非阻塞IO。NIO有三大组件：<strong>Channel，Bugger， Selector</strong>。</p>
 <h1 id="三大组件"><a href="#三大组件" class="headerlink" title="三大组件"></a>三大组件</h1><h2 id="Channel-amp-amp-Buffer"><a href="#Channel-amp-amp-Buffer" class="headerlink" title="Channel &amp;&amp; Buffer"></a>Channel &amp;&amp; Buffer</h2><p>Channel相当与一个stream，它就是读写数据的<strong>双向通道</strong>，channel可以把数据写入buffer，也可以把数据从buffer读出。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">graph LR;</span><br><span class="line">	channel--&gt;buffer</span><br><span class="line">	buffer--&gt;channel</span><br></pre></td></tr></table></figure>
@@ -827,785 +830,44 @@
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WriterServer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        ServerSocketChannel ssc = ServerSocketChannel.open();</span><br><span class="line">        ssc.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">        Selector selector = Selector.open();</span><br><span class="line">        ssc.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line">        ssc.bind(<span class="keyword">new</span> InetSocketAddress(<span class="number">8080</span>));</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            selector.select();</span><br><span class="line">            Iterator&lt;SelectionKey&gt; iterator = selector.selectedKeys().iterator();</span><br><span class="line">            <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">                SelectionKey key = iterator.next();</span><br><span class="line">                iterator.remove();</span><br><span class="line">                <span class="keyword">if</span> (key.isAcceptable()) &#123;</span><br><span class="line">                    SocketChannel sc = ssc.accept();</span><br><span class="line">                    sc.configureBlocking(<span class="keyword">false</span>); <span class="comment">// 注意阻塞模式下，write会一次性写完所有数据</span></span><br><span class="line">                    SelectionKey scKey = sc.register(selector, SelectionKey.OP_READ);</span><br><span class="line">                    <span class="comment">// 给客户端传递大量数据</span></span><br><span class="line">                    StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3000000</span>; i++) sb.append(<span class="string">"a"</span>);</span><br><span class="line">                    ByteBuffer buffer = Charset.defaultCharset().encode(sb.toString());</span><br><span class="line">                    <span class="keyword">if</span> (buffer.hasRemaining()) &#123;</span><br><span class="line">                        scKey.interestOps(scKey.interestOps() | SelectionKey.OP_WRITE); <span class="comment">// 添加事件</span></span><br><span class="line">                        scKey.attach(buffer); <span class="comment">// 将buffer挂上</span></span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (key.isWritable()) &#123;</span><br><span class="line">                    ByteBuffer buffer = (ByteBuffer) key.attachment();</span><br><span class="line">                    SocketChannel sc = (SocketChannel) key.channel();</span><br><span class="line">                    <span class="keyword">int</span> write = sc.write(buffer);</span><br><span class="line">                    System.out.println(write);</span><br><span class="line">                    <span class="keyword">if</span> (!buffer.hasRemaining()) &#123;</span><br><span class="line">                        key.attach(<span class="keyword">null</span>); <span class="comment">// 清理</span></span><br><span class="line">                        key.interestOps(key.interestOps() - SelectionKey.OP_WRITE); <span class="comment">// 取消关注</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-      
     </div>
 
     
     
     
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>MemoForward
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2022/07/08/NIO%E5%9F%BA%E7%A1%80/" title="NIO基础">http://yoursite.com/2022/07/08/NIO基础/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
         
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/01/Kafka%E8%87%AA%E6%95%B4%E7%90%86%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/01/01/Kafka%E8%87%AA%E6%95%B4%E7%90%86%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Kafka自整理学习笔记</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-01-01 11:30:14" itemprop="dateCreated datePublished" datetime="2022-01-01T11:30:14+08:00">2022-01-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-03 23:13:03" itemprop="dateModified" datetime="2022-01-03T23:13:03+08:00">2022-01-03</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<ol>
-<li><p>本博客整理了一些Kafka的基本概念和使用</p>
-</li>
-<li><p>自己用来当笔记的，故不需要图帮助理解</p>
-</li>
-<li>只有Java端的使用，C++端的以后可能会补上</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/01/01/Kafka%E8%87%AA%E6%95%B4%E7%90%86%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/01/Kafka%E8%87%AA%E6%95%B4%E7%90%86%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="Kafka自整理学习笔记">
+      <i class="fa fa-chevron-left"></i> Kafka自整理学习笔记
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/09/01/git%E7%94%A8%E6%B3%95%E6%B5%85%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/09/01/git%E7%94%A8%E6%B3%95%E6%B5%85%E6%9E%90/" class="post-title-link" itemprop="url">git用法浅析</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-09-01 22:47:31" itemprop="dateCreated datePublished" datetime="2021-09-01T22:47:31+08:00">2021-09-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-09-29 10:42:48" itemprop="dateModified" datetime="2021-09-29T10:42:48+08:00">2021-09-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
     
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要记录git常见的基础用法以及如何离线在linux上安装git。</p>
-<p>本文旨在让人成为git使用者而不是git使用专家，所有命令基本都是充分且必要的。</p>
-<blockquote>
-<ol>
-<li>git是什么</li>
-<li>linux离线安装git</li>
-<li>git基本用法</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/09/01/git%E7%94%A8%E6%B3%95%E6%B5%85%E6%9E%90/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/07/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">正则表达式笔记</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-07-22 08:39:38 / 修改时间：13:56:34" itemprop="dateCreated datePublished" datetime="2021-07-22T08:39:38+08:00">2021-07-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要对正则表达式的一些语法进行了一些记录，有机会长期补充一下：</p>
-<blockquote>
-<p>正则表达式基础语法</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/07/22/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/19/Java%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/07/19/Java%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF/" class="post-title-link" itemprop="url">Java中的继承</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-07-19 18:35:19" itemprop="dateCreated datePublished" datetime="2021-07-19T18:35:19+08:00">2021-07-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-20 11:50:14" itemprop="dateModified" datetime="2021-07-20T11:50:14+08:00">2021-07-20</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<p>本文主要针对一些比较模糊的问题进行总结：</p>
-<ol>
-<li>引用是父类，实例是子类</li>
-<li>super和this</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/07/19/Java%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/19/Java8%E7%89%B9%E6%80%A7lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/07/19/Java8%E7%89%B9%E6%80%A7lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Java8特性lambda表达式笔记</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-07-19 08:38:48" itemprop="dateCreated datePublished" datetime="2021-07-19T08:38:48+08:00">2021-07-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-23 18:22:30" itemprop="dateModified" datetime="2021-07-23T18:22:30+08:00">2021-07-23</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<p>本文涉及以下知识：</p>
-<ol>
-<li>Lambda表达式基本概念</li>
-<li>Lambda表达式语法</li>
-<li>Lambda表达式实战：java.util.function</li>
-<li>Stream 流的概念</li>
-<li>Stream实战</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/07/19/Java8%E7%89%B9%E6%80%A7lambda%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/30/%E9%99%90%E6%B5%81%E5%B7%A5%E5%85%B7RateLimiter%E5%92%8CSemaphore/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/10/30/%E9%99%90%E6%B5%81%E5%B7%A5%E5%85%B7RateLimiter%E5%92%8CSemaphore/" class="post-title-link" itemprop="url">限流工具RateLimiter和Semaphore解析</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-10-30 11:19:09" itemprop="dateCreated datePublished" datetime="2020-10-30T11:19:09+08:00">2020-10-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-02 16:34:31" itemprop="dateModified" datetime="2020-11-02T16:34:31+08:00">2020-11-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<p>本文主要介绍限流工具RateLimiter和Semaphore</p>
-<ol>
-<li>RateLimiter介绍</li>
-<li>Semaphore</li>
-<li>使用场景分析</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/10/30/%E9%99%90%E6%B5%81%E5%B7%A5%E5%85%B7RateLimiter%E5%92%8CSemaphore/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/" class="post-title-link" itemprop="url">HTTP详解</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-09-18 11:19:09" itemprop="dateCreated datePublished" datetime="2020-09-18T11:19:09+08:00">2020-09-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-22 20:33:02" itemprop="dateModified" datetime="2020-09-22T20:33:02+08:00">2020-09-22</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<p>本文主要梳理HTTP协议的知识体系</p>
-<ol>
-<li>HTTP基础</li>
-<li>DNS</li>
-<li>HTTP缓存策略</li>
-<li>HTTPS</li>
-<li>常见问题</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/09/18/HTTP%E8%AF%A6%E8%A7%A3/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/17/%E8%AE%A1%E7%BD%91%E7%9B%B8%E5%85%B3%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/09/17/%E8%AE%A1%E7%BD%91%E7%9B%B8%E5%85%B3%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">计网相关基础知识</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-09-17 11:19:09" itemprop="dateCreated datePublished" datetime="2020-09-17T11:19:09+08:00">2020-09-17</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-02 17:27:27" itemprop="dateModified" datetime="2020-11-02T17:27:27+08:00">2020-11-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
-<p>本文旨在介绍计网的相关基础知识，只介绍到网络层之上</p>
-<ol>
-<li>计算机网络概述</li>
-<li>应用层</li>
-<li>Socket</li>
-<li>传输层</li>
-<li>网络层</li>
-</ol>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/09/17/%E8%AE%A1%E7%BD%91%E7%9B%B8%E5%85%B3%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/15/Reids%E5%92%8CMemcached/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/personal.png">
-      <meta itemprop="name" content="MemoForward">
-      <meta itemprop="description" content="一个温柔又专情的闷骚之人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MemoForward's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/09/15/Reids%E5%92%8CMemcached/" class="post-title-link" itemprop="url">Reids和Memcached对比</a>
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-09-15 11:19:09" itemprop="dateCreated datePublished" datetime="2020-09-15T11:19:09+08:00">2020-09-15</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-02 17:24:05" itemprop="dateModified" datetime="2020-11-02T17:24:05+08:00">2020-11-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Reids和Memcached对比"><a href="#Reids和Memcached对比" class="headerlink" title="Reids和Memcached对比"></a>Reids和Memcached对比</h1><blockquote>
-<p>本文简单介绍了Redis和Memcached的区别</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/09/15/Reids%E5%92%8CMemcached/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
   </article>
   
   
@@ -1613,15 +875,10 @@
 
   </div>
 
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
-
-
 
           </div>
           
+    <div class="comments" id="gitalk-container"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -1668,6 +925,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#NIO基础"><span class="nav-number">1.</span> <span class="nav-text">NIO基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">2.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#概念"><span class="nav-number">3.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三大组件"><span class="nav-number">4.</span> <span class="nav-text">三大组件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Channel-amp-amp-Buffer"><span class="nav-number">4.1.</span> <span class="nav-text">Channel &amp;&amp; Buffer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Selector"><span class="nav-number">4.2.</span> <span class="nav-text">Selector</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#多线程版"><span class="nav-number">4.2.1.</span> <span class="nav-text">多线程版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池"><span class="nav-number">4.2.2.</span> <span class="nav-text">线程池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Selector-1"><span class="nav-number">4.2.3.</span> <span class="nav-text">Selector</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ByteBuffer"><span class="nav-number">5.</span> <span class="nav-text">ByteBuffer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本参数"><span class="nav-number">5.1.</span> <span class="nav-text">基本参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本API"><span class="nav-number">5.2.</span> <span class="nav-text">基本API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分配"><span class="nav-number">5.2.0.1.</span> <span class="nav-text">分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#读取"><span class="nav-number">5.2.0.2.</span> <span class="nav-text">读取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#写入"><span class="nav-number">5.2.0.3.</span> <span class="nav-text">写入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他"><span class="nav-number">5.2.0.4.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图解"><span class="nav-number">5.3.</span> <span class="nav-text">图解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuffer和字符串互转"><span class="nav-number">5.4.</span> <span class="nav-text">ByteBuffer和字符串互转</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串转ByteBuffer"><span class="nav-number">5.4.1.</span> <span class="nav-text">字符串转ByteBuffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteBuffer转字符串"><span class="nav-number">5.4.2.</span> <span class="nav-text">ByteBuffer转字符串</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分散读-amp-amp-集中写"><span class="nav-number">5.5.</span> <span class="nav-text">分散读 &amp;&amp; 集中写</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分散读"><span class="nav-number">5.5.1.</span> <span class="nav-text">分散读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集中写"><span class="nav-number">5.5.2.</span> <span class="nav-text">集中写</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ByteBuffer小练习"><span class="nav-number">5.6.</span> <span class="nav-text">ByteBuffer小练习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#需求描述（粘包半包）"><span class="nav-number">5.6.1.</span> <span class="nav-text">需求描述（粘包半包）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解法"><span class="nav-number">5.6.2.</span> <span class="nav-text">解法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件编程"><span class="nav-number">6.</span> <span class="nav-text">文件编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FileChannel"><span class="nav-number">6.1.</span> <span class="nav-text">FileChannel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取"><span class="nav-number">6.1.1.</span> <span class="nav-text">获取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读取-1"><span class="nav-number">6.1.2.</span> <span class="nav-text">读取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入-1"><span class="nav-number">6.1.3.</span> <span class="nav-text">写入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭"><span class="nav-number">6.1.4.</span> <span class="nav-text">关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#位置"><span class="nav-number">6.1.5.</span> <span class="nav-text">位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#大小"><span class="nav-number">6.1.6.</span> <span class="nav-text">大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#强制写入"><span class="nav-number">6.1.7.</span> <span class="nav-text">强制写入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两个FileChannel之间传输数据"><span class="nav-number">6.1.8.</span> <span class="nav-text">两个FileChannel之间传输数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Path"><span class="nav-number">6.2.</span> <span class="nav-text">Path</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Files"><span class="nav-number">6.3.</span> <span class="nav-text">Files</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础API"><span class="nav-number">6.3.1.</span> <span class="nav-text">基础API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进阶API"><span class="nav-number">6.3.2.</span> <span class="nav-text">进阶API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#需求1：如何删除多级目录？"><span class="nav-number">6.3.2.1.</span> <span class="nav-text">需求1：如何删除多级目录？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Walk"><span class="nav-number">6.3.2.2.</span> <span class="nav-text">Walk</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络编程"><span class="nav-number">7.</span> <span class="nav-text">网络编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#阻塞式（NIO实现）"><span class="nav-number">7.1.</span> <span class="nav-text">阻塞式（NIO实现）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">7.1.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">7.1.2.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非阻塞式（NIO-Channel实现）"><span class="nav-number">7.2.</span> <span class="nav-text">非阻塞式（NIO Channel实现）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题-1"><span class="nav-number">7.2.1.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非阻塞式改进（Selector）"><span class="nav-number">7.3.</span> <span class="nav-text">非阻塞式改进（Selector）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Selector-2"><span class="nav-number">7.3.0.1.</span> <span class="nav-text">Selector</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SelectedKeys"><span class="nav-number">7.3.0.2.</span> <span class="nav-text">SelectedKeys</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简单实现"><span class="nav-number">7.3.0.3.</span> <span class="nav-text">简单实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改进版本一"><span class="nav-number">7.3.0.4.</span> <span class="nav-text">改进版本一</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#改进版本二"><span class="nav-number">7.3.0.5.</span> <span class="nav-text">改进版本二</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息边界问题"><span class="nav-number">7.4.</span> <span class="nav-text">消息边界问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理写事件："><span class="nav-number">7.5.</span> <span class="nav-text">处理写事件：</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -1870,6 +1128,25 @@ window.addEventListener('pjax:success', () => {
 
   
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '4a4e80d6432798f5c023',
+      clientSecret: 'ef38d73f2ebc13d42df25af78048c374729dceed',
+      repo        : 'memoforward.github.io',
+      owner       : 'MemoForward',
+      admin       : ['MemoForward'],
+      id          : '846cbb3b9164dc5715b1360741502cb5',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
 
     </div>
 </body>
