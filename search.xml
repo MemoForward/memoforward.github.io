@@ -68,7 +68,7 @@
 <li>limit：可读或可写的最大索引位置。</li>
 <li>capacity：ByteBuffer中数组的容量。</li>
 </ul>
-<h2 id="基本API"><a href="#基本API" class="headerlink" title="基本API"></a>基本API</h2><h4 id="分配"><a href="#分配" class="headerlink" title="分配"></a>分配</h4><ul>
+<h2 id="基本API"><a href="#基本API" class="headerlink" title="基本API"></a>基本API</h2><h3 id="分配"><a href="#分配" class="headerlink" title="分配"></a>分配</h3><ul>
 <li><code>ByteBuffer buff = ByteBuffer.allocate(int capacity)</code>：获取一个<code>ByteBuffer ==&gt; HeapByteBuffer</code>，使用java堆内存<ul>
 <li>读写效率较低</li>
 <li>受垃圾回收影响，会改变内存位置</li>
@@ -81,7 +81,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h4><ul>
+<h3 id="读取"><a href="#读取" class="headerlink" title="读取"></a>读取</h3><ul>
 <li><code>byte b = buff.get()</code>：获取缓存中一个字节（pos后移）</li>
 <li><code>buff.get(int idx)</code>：获取指定位置的字节（pos不变）</li>
 <li><code>int writeBytes = channel.write(buff)</code>：从buff中读数据，通过channel写入其他<ul>
@@ -89,7 +89,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="写入"><a href="#写入" class="headerlink" title="写入"></a>写入</h4><ul>
+<h3 id="写入"><a href="#写入" class="headerlink" title="写入"></a>写入</h3><ul>
 <li><code>buff.put(byte b) || buff.put(byte[] bs)</code>：存入字节或字节数组（pos变化）</li>
 <li><code>int readBytes = channel.read(buff)</code>：把channel中的数据写入buff<ul>
 <li>返回写入的字节数，会受到buff容量的限制</li>
@@ -97,7 +97,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
 <li><code>buff.flip()</code>：切换读模式（pos变0）</li>
 <li><code>buff.rewind()</code>：读模式下，pos置0，即从头开始读</li>
 <li><code>buff.clear()</code>：切换写模式（pos归零）</li>
@@ -141,23 +141,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity + limit</th>
+<th></th>
+<th></th>
+<th></th>
+<th>pos</th>
+<th></th>
+<th></th>
+<th>capacity + limit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -169,23 +169,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">limit</th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity</th>
+<th>pos</th>
+<th></th>
+<th></th>
+<th>limit</th>
+<th></th>
+<th></th>
+<th>capacity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -197,23 +197,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos</th>
-<th style="text-align:center">limit</th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity</th>
+<th></th>
+<th></th>
+<th>pos</th>
+<th>limit</th>
+<th></th>
+<th></th>
+<th>capacity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -228,23 +228,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity+limit</th>
+<th></th>
+<th>pos</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th>capacity+limit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">c</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>c</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -256,22 +256,22 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
+<th>pos</th>
 <th></th>
-<th style="text-align:center">capacity + limit</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th>capacity + limit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 <td></td>
 </tr>
 </tbody>
@@ -284,23 +284,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity + limit</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th>pos</th>
+<th></th>
+<th>capacity + limit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center">d</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td>d</td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -314,23 +314,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center">limit</th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity</th>
+<th></th>
+<th></th>
+<th>pos</th>
+<th></th>
+<th>limit</th>
+<th></th>
+<th>capacity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center">d</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td>d</td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -342,23 +342,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos+limit</th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
+<th>pos+limit</th>
+<th></th>
+<th>capacity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center">d</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td>d</td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -370,23 +370,23 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:center"></th>
-<th style="text-align:center"></th>
-<th style="text-align:center">pos</th>
-<th style="text-align:center"></th>
-<th style="text-align:center">limit</th>
-<th style="text-align:center"></th>
-<th style="text-align:center">capacity</th>
+<th></th>
+<th></th>
+<th>pos</th>
+<th></th>
+<th>limit</th>
+<th></th>
+<th>capacity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:center">a</td>
-<td style="text-align:center">b</td>
-<td style="text-align:center">c</td>
-<td style="text-align:center">d</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
+<td>a</td>
+<td>b</td>
+<td>c</td>
+<td>d</td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -398,8 +398,7 @@
 <h3 id="集中写"><a href="#集中写" class="headerlink" title="集中写"></a>集中写</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ByteBuffer b1 = StandardCharsets.UTF_8.encode(<span class="string">"hello"</span>);</span><br><span class="line">ByteBuffer b2 = StandardCharsets.UTF_8.encode(<span class="string">"world"</span>);</span><br><span class="line">ByteBuffer b3 = StandardCharsets.UTF_8.encode(<span class="string">"你好！"</span>);</span><br><span class="line"><span class="keyword">try</span>(FileChannel channel = <span class="keyword">new</span> RandAccessFile(path, <span class="string">"rw"</span>).getChannel()) &#123;</span><br><span class="line">    channel.write(<span class="keyword">new</span> ByteBuffer[]&#123;b1, b2, b3&#125;);</span><br><span class="line">&#125;<span class="keyword">catch</span>(IOException e) &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="ByteBuffer小练习"><a href="#ByteBuffer小练习" class="headerlink" title="ByteBuffer小练习"></a>ByteBuffer小练习</h2><h3 id="需求描述（粘包半包）"><a href="#需求描述（粘包半包）" class="headerlink" title="需求描述（粘包半包）"></a>需求描述（粘包半包）</h3><p>多条数据，组合成一条消息发送给服务端，通过<strong>字符c</strong>来进行分割每条数据，服务端可能会接收到多个包（ByteBuffer[]），写一段代码，将每条数据进行打印。</p>
 <h3 id="解法"><a href="#解法" class="headerlink" title="解法"></a>解法</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;String&gt; <span class="title">parseMessage</span><span class="params">(ByteBuffer[] buffers, <span class="keyword">char</span> c)</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span> capacity = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (ByteBuffer byteBuffer : buffers) capacity += byteBuffer.capacity();</span><br><span class="line">    ByteBuffer source = ByteBuffer.allocate(capacity); <span class="comment">// 用一个source来接受所有的包</span></span><br><span class="line">    <span class="keyword">for</span> (ByteBuffer byteBuffer : buffers) &#123;</span><br><span class="line">        source.put(byteBuffer);</span><br><span class="line">        source.flip();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; source.limit(); j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((<span class="keyword">char</span>) source.get(j) == c) &#123;</span><br><span class="line">                <span class="keyword">int</span> length = j - source.position();</span><br><span class="line">                ByteBuffer targetData = ByteBuffer.allocate(length);</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; length; k++) &#123;</span><br><span class="line">                    targetData.put(source.get()); <span class="comment">// source读，并pos移动位置</span></span><br><span class="line">                &#125;</span><br><span class="line">                source.get(); <span class="comment">// pos跳过分割字符</span></span><br><span class="line">                targetData.flip(); <span class="comment">// 必须切换成读模式</span></span><br><span class="line">                res.add(StandardCharsets.UTF_8.decode(targetData).toString());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        source.compact();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="文件编程"><a href="#文件编程" class="headerlink" title="文件编程"></a>文件编程</h1><h2 id="FileChannel"><a href="#FileChannel" class="headerlink" title="FileChannel"></a>FileChannel</h2><font color="red">**注意：只能工作在阻塞模式下**</font>
-
+<h1 id="文件编程"><a href="#文件编程" class="headerlink" title="文件编程"></a>文件编程</h1><h2 id="FileChannel"><a href="#FileChannel" class="headerlink" title="FileChannel"></a>FileChannel</h2><p><strong><font color="red">注意：只能工作在阻塞模式下</font></strong></p>
 <h3 id="获取"><a href="#获取" class="headerlink" title="获取"></a>获取</h3><p>不能直接打开FileChannel，必须通过<code>FileInputStream, FileOutputStream</code>或者<code>RandomAccessFile</code>来获取，通过<code>getChannel()</code>方法</p>
 <blockquote>
 <p>FileInputStream获取的Channel只读</p>
