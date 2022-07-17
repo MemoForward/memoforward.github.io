@@ -6,7 +6,8 @@
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>介绍Netty的概述和基础用法。</p>
 <blockquote>
 <ol>
-<li>miaomiaomiao</li>
+<li>组件</li>
+<li>简单实现</li>
 </ol>
 </blockquote>
 <a id="more"></a>
@@ -259,7 +260,7 @@
 <h3 id="composite"><a href="#composite" class="headerlink" title="composite"></a>composite</h3><p>零拷贝，把ByteBuf整合。和<code>writeBytes</code>深拷贝对应。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestByteComposite</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ByteBuf buf1 = ByteBufAllocator.DEFAULT.buffer();</span><br><span class="line">        buf1.writeBytes(<span class="keyword">new</span> <span class="keyword">byte</span>[]&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;);</span><br><span class="line">        buf1.retain();</span><br><span class="line">        ByteBuf buf2 = ByteBufAllocator.DEFAULT.buffer();</span><br><span class="line">        buf2.retain();</span><br><span class="line">        buf2.writeBytes(<span class="keyword">new</span> <span class="keyword">byte</span>[]&#123;<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>&#125;);</span><br><span class="line">        ByteBuf buf3 = ByteBufAllocator.DEFAULT.buffer();</span><br><span class="line">        buf3.retain();</span><br><span class="line">        buf3.writeBytes(<span class="keyword">new</span> <span class="keyword">byte</span>[]&#123;<span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">15</span>&#125;);</span><br><span class="line"></span><br><span class="line">        CompositeByteBuf compositeByteBuf = ByteBufAllocator.DEFAULT.compositeBuffer();</span><br><span class="line">        compositeByteBuf.addComponents(<span class="keyword">true</span>, buf1, buf2); <span class="comment">// 加true自动移动写指针</span></span><br><span class="line">        buf1.release();buf2.release();</span><br><span class="line">        compositeByteBuf.addComponent(buf3); <span class="comment">// 不加true，不会变写指针，只会改变capacity, writeIdx: 10 ,cap: 15</span></span><br><span class="line">        <span class="comment">// 可见如果维护写指针，会找上一个写指针的位置往后写，并不是单纯的内存拼接</span></span><br><span class="line">        compositeByteBuf.addComponent(<span class="keyword">true</span>, buf3); <span class="comment">// writeIdx：15， cap: 20</span></span><br><span class="line">        buf3.release();</span><br><span class="line">        log(compositeByteBuf);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>使用零拷贝，最好都要retain和release。</p>
-<h3 id="UDP的简单实现"><a href="#UDP的简单实现" class="headerlink" title="UDP的简单实现"></a>UDP的简单实现</h3><p>上面都是TCP，咱们参照github，写一段UDP的链接，<a href="https://github.com/netty/netty" target="_blank" rel="noopener">Netty-github官网</a>。</p>
+<h3 id="UDP的简单实现（纯原创，欢迎交流）"><a href="#UDP的简单实现（纯原创，欢迎交流）" class="headerlink" title="UDP的简单实现（纯原创，欢迎交流）"></a>UDP的简单实现（纯原创，欢迎交流）</h3><p>上面都是TCP，咱们参照github，写一段UDP的链接，<a href="https://github.com/netty/netty" target="_blank" rel="noopener">Netty-github官网</a>。</p>
 <ul>
 <li>服务端</li>
 </ul>
@@ -274,8 +275,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>计算机网络</tag>
         <tag>Java</tag>
+        <tag>计算机网络</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
@@ -982,8 +983,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>计算机网络</tag>
         <tag>Java</tag>
+        <tag>计算机网络</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
