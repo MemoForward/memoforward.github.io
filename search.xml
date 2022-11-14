@@ -1,6 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Swagger-ui</title>
+    <url>/2022/11/14/Swagger-ui/</url>
+    <content><![CDATA[<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--swagger--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger-ui<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>注意：不同版本的swagger注解配置有点不一样</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><ul>
+<li>先要在Java里面配置Config，并加上<code>@EnableSwagger2</code>和<code>Configuration</code>已保证应用启动时可以扫描到配置</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableSwagger</span>2</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SwaggerConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> ApiInfo <span class="title">webApiInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiInfoBuilder()</span><br><span class="line">                .title(<span class="string">"测试"</span>)</span><br><span class="line">                .description(<span class="string">"接口定义"</span>)</span><br><span class="line">                .version(<span class="string">"1.0"</span>)</span><br><span class="line">                .contact(<span class="keyword">new</span> Contact(<span class="string">"memo"</span>, <span class="string">"http://www.memo.com"</span>, <span class="string">"11@qq.com"</span>))</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Docket <span class="title">webApiConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Docket(DocumentationType.SWAGGER_2)</span><br><span class="line">                .groupName(<span class="string">"cetc"</span>)</span><br><span class="line">                .apiInfo(webApiInfo())</span><br><span class="line">                .select()</span><br><span class="line">                .paths(Predicates.not(PathSelectors.regex(<span class="string">"/admin/*"</span>)))</span><br><span class="line">                .paths(Predicates.not(PathSelectors.regex(<span class="string">"/error/*"</span>)))</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>类上或者方法上加注解（<code>@Api</code>和<code>@ApiOperation</code>）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Api</span>(tags = &#123;<span class="string">"学生管理"</span>&#125;)</span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/student"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StudentController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    StudentService studentService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiOperation</span>(<span class="string">"查看学生列表"</span>)</span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/list"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> R <span class="title">getStudentList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;Student&gt; students = studentService.list();</span><br><span class="line">        <span class="keyword">if</span> (students != <span class="keyword">null</span> &amp;&amp; students.size() != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> R.ok().data(<span class="string">"students"</span>, students);</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">return</span> R.error();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 属性也可以写</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">R</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiModelProperty</span>(value = <span class="string">"是否成功"</span>)</span><br><span class="line">    <span class="keyword">private</span> Boolean success;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiModelProperty</span>(value = <span class="string">"返回状态码"</span>)</span><br><span class="line">    <span class="keyword">private</span> Integer code;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiModelProperty</span>(value = <span class="string">"返回消息"</span>)</span><br><span class="line">    <span class="keyword">private</span> String message;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiModelProperty</span>(value = <span class="string">"返回数据"</span>)</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, Object&gt; data = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">R</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> R <span class="title">ok</span><span class="params">()</span></span>&#123;</span><br><span class="line">        R r = <span class="keyword">new</span> R();</span><br><span class="line">        r.setSuccess(<span class="keyword">true</span>);</span><br><span class="line">        r.setCode(ResultCode.SUCCESS);</span><br><span class="line">        r.setMessage(<span class="string">"成功"</span>);</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> R <span class="title">error</span><span class="params">()</span></span>&#123;</span><br><span class="line">        R r = <span class="keyword">new</span> R();</span><br><span class="line">        r.setSuccess(<span class="keyword">false</span>);</span><br><span class="line">        r.setCode(ResultCode.ERROR);</span><br><span class="line">        r.setMessage(<span class="string">"失败"</span>);</span><br><span class="line">        <span class="keyword">return</span> r;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> R <span class="title">success</span><span class="params">(Boolean success)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.setSuccess(success);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> R <span class="title">code</span><span class="params">(Integer code)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.setCode(code);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> R <span class="title">message</span><span class="params">(String message)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.setMessage(message);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> R <span class="title">data</span><span class="params">(String key, Object value)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.data.put(key, value);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> R <span class="title">data</span><span class="params">(Map&lt;String, Object&gt; map)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.setData(map);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>输入网址：<code>localhost:xxxx/swagger-ui.html</code></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Java</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Netty进阶</title>
+    <url>/2022/07/21/Netty%E8%BF%9B%E9%98%B6/</url>
+    <content><![CDATA[<h1 id="Netty进阶"><a href="#Netty进阶" class="headerlink" title="Netty进阶"></a>Netty进阶</h1>]]></content>
+      <categories>
+        <category>计算机网络</category>
+        <category>网络编程</category>
+      </categories>
+      <tags>
+        <tag>计算机网络</tag>
+        <tag>Java</tag>
+        <tag>NIO</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Netty基础</title>
     <url>/2022/07/15/Netty%E5%9F%BA%E7%A1%80/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>介绍Netty的概述和基础用法。</p>
@@ -275,8 +314,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>计算机网络</tag>
+        <tag>Java</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
@@ -983,8 +1022,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>计算机网络</tag>
+        <tag>Java</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
