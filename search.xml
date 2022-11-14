@@ -1,6 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Ribbon负载均衡基础</title>
+    <url>/2022/11/14/Ribbon%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>介绍Ribbon负载均衡的一些简单流程和基础知识</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="负载均衡流程"><a href="#负载均衡流程" class="headerlink" title="负载均衡流程"></a>负载均衡流程</h1><ul>
+<li>消费者通过服务名称的url发起请求</li>
+<li>Ribbon对请求进行拦截，然后去找真实地址</li>
+<li>Ribbon通过Eureka拉取到了n个服务列表</li>
+<li>Ribbon对服务进行负载均衡的选取</li>
+<li>请求真实的服务</li>
+</ul>
+<p>PS：<code>@LoadBalanced</code>表示这个Bean的请求要被Ribbon拦截了</p>
+<h2 id="负载均衡策略"><a href="#负载均衡策略" class="headerlink" title="负载均衡策略"></a>负载均衡策略</h2><p>Ribbon中的负载均衡策略类接口：IRule。</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>内置负载均衡规则类</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RoundRobinRule</td>
+<td>简单轮询服务列表选择服务器。它是Ribbon默认的负载均衡规则。</td>
+</tr>
+<tr>
+<td>AvailabilityFileteringRule</td>
+<td>- 对服务器3次请求失败，会标记为短路<br>- 忽略并发数过高的服务器，并发数上限可以配置</td>
+</tr>
+<tr>
+<td>WeightedResponseTimeRule</td>
+<td>为服务器赋予权重值。服务器相应时间越长，权重越小。</td>
+</tr>
+<tr>
+<td>ZoneAvoidanceRule</td>
+<td>以区域可用的服务器为基础进行服务器的选择。</td>
+</tr>
+<tr>
+<td>BestAvailabledRule</td>
+<td>忽略短路的服务器，并选择并发低的服务器</td>
+</tr>
+<tr>
+<td>RandomRule</td>
+<td>随机</td>
+</tr>
+<tr>
+<td>RetryRule</td>
+<td>重试</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>调整规则</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 全局配置：在Application里面修改负载均衡规则</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> IRule <span class="title">randomRule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> RandomRule();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 局部配置：在application.yml里面配置,如在orderservice里面配置userservice服务的负载均衡策略</span></span><br><span class="line">userservice.ribbon.NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule</span><br></pre></td></tr></table></figure>
+<h2 id="Ribbon饥饿加载"><a href="#Ribbon饥饿加载" class="headerlink" title="Ribbon饥饿加载"></a>Ribbon饥饿加载</h2><p>默认采用懒加载，第一次访问才会创建拦截客户端，会进行服务拉取，耗时长。</p>
+<ul>
+<li>开启饿加载</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">ribbon:</span></span><br><span class="line">	<span class="attr">eager-load:</span></span><br><span class="line">		<span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">		<span class="comment">#clients: userservice # 指定对某个服务饿加载</span></span><br><span class="line">		<span class="attr">clients:</span> <span class="comment"># 对多个服务饿加载</span></span><br><span class="line">			<span class="bullet">-</span> <span class="string">service1</span></span><br><span class="line">			<span class="bullet">-</span> <span class="string">service2</span></span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>负载均衡规则<ul>
+<li>规则接口是IRule</li>
+<li>默认实现是ZoneAvoidanceRule，根据zone选择服务列表，然后轮询</li>
+</ul>
+</li>
+<li>负载均衡自定义方式<ul>
+<li>代码方式：配置灵活，但修改时需要重新打包发布</li>
+<li>配置方式：无需重新打包，无法做全局配置</li>
+</ul>
+</li>
+<li>饥饿加载<ul>
+<li>开启饿加载</li>
+<li>指定饿加载的服务名称</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>微服务</category>
+        <category>SpringCloud</category>
+      </categories>
+      <tags>
+        <tag>微服务</tag>
+        <tag>Ribbon</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Erueka基础</title>
     <url>/2022/11/14/Erueka%E5%9F%BA%E7%A1%80/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
@@ -72,6 +164,7 @@
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
 <p>简单介绍Swagger-ui2.7.0的基本使用</p>
 </blockquote>
+<a id="more"></a>
 <h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--swagger--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger-ui<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>注意：不同版本的swagger注解配置有点不一样</p>
 <h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><ul>
@@ -103,8 +196,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>计算机网络</tag>
+        <tag>Java</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
@@ -383,8 +476,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>计算机网络</tag>
+        <tag>Java</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
@@ -1091,8 +1184,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>Java</tag>
         <tag>计算机网络</tag>
+        <tag>Java</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
