@@ -1,9 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Erueka基础</title>
+    <url>/2022/11/14/Erueka%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>简单介绍了Erueka作为服务注册中心的基本使用</p>
+</blockquote>
+<a id="more"></a>
+<h1 id="服务调用出现的问题"><a href="#服务调用出现的问题" class="headerlink" title="服务调用出现的问题"></a>服务调用出现的问题</h1><ul>
+<li>URL需要硬编码在代码中，无法动态分配，也无法做负载均衡</li>
+<li>服务消费者该如何获取服务提供者的地址信息？</li>
+<li>如果有多个提供者，消费者如何选择</li>
+<li>消费者如何得知服务的健康状态</li>
+</ul>
+<h1 id="Eureka"><a href="#Eureka" class="headerlink" title="Eureka"></a>Eureka</h1><p>注册中心。</p>
+<ol>
+<li>服务提供者需要向Eureka注册服务信息</li>
+<li>消费者从Eureka拉取服务</li>
+<li>消费者负载均衡，从列表里挑选一个</li>
+<li>消费者远程调用</li>
+<li>服务提供者会向Eureka提供心跳，Erueka更新服务的异常状态</li>
+</ol>
+<h2 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h2><ul>
+<li>依赖</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- eureka 服务端 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-server<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- eureka 客户端 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>服务端使用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableEurekaServer</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EurekaApplication</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(EurekaApplication<span class="class">.<span class="keyword">class</span>, <span class="title">args</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">10001</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 服务注册</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">eurekaserver</span> <span class="comment"># 服务名称</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">service-url:</span> <span class="comment"># eureka 的地址信息，eureka会把自己也注册到eureka注册上</span></span><br><span class="line">      <span class="attr">defaultZone:</span> <span class="string">http://127.0.0.1:10001/eureka</span></span><br><span class="line">    <span class="attr">fetch-registry:</span> <span class="literal">false</span> <span class="comment"># 启动时不同步集群（因为是单点）</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>客户端使用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用服务名代替ip和端口号</span></span><br><span class="line">String url = “http:<span class="comment">//userservice/user/” + id；</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在RestTemplate上添加负载均衡的注解（Application上）</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@LoadBalanced</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> RestTemplate();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 服务注册</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">orderservice</span> <span class="comment"># 服务名称</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">service-url:</span> <span class="comment"># eureka 的地址信息，eureka会把自己也注册到eureka注册上</span></span><br><span class="line">      <span class="attr">defaultZone:</span> <span class="string">http://127.0.0.1:10001/eureka</span></span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>搭建EurekaServer<ul>
+<li>引入eureka-server依赖</li>
+<li>添加@EnableEurekaServer注解</li>
+<li>在applcation中配置eureka地址</li>
+</ul>
+</li>
+<li>服务注册<ul>
+<li>引入eureka-client依赖</li>
+<li>在application.yml中配置eureka地址</li>
+</ul>
+</li>
+<li>服务发现<ul>
+<li>引入eureka-client依赖</li>
+<li>在application.yml中配置eureka地址</li>
+<li>给RestTemplate添加@LoadBalanced注解</li>
+<li>用服务提供者的服务名称远程调用</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>微服务</category>
+        <category>SpringCloud</category>
+      </categories>
+      <tags>
+        <tag>微服务</tag>
+        <tag>SpringCloud</tag>
+        <tag>Eureka</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Swagger-ui</title>
     <url>/2022/11/14/Swagger-ui/</url>
-    <content><![CDATA[<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--swagger--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger-ui<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><blockquote>
+<p>简单介绍Swagger-ui2.7.0的基本使用</p>
+</blockquote>
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!--swagger--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger-ui<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.7.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>注意：不同版本的swagger注解配置有点不一样</p>
 <h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><ul>
 <li>先要在Java里面配置Config，并加上<code>@EnableSwagger2</code>和<code>Configuration</code>已保证应用启动时可以扫描到配置</li>
@@ -34,8 +103,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>计算机网络</tag>
         <tag>Java</tag>
+        <tag>计算机网络</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
@@ -314,8 +383,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>计算机网络</tag>
         <tag>Java</tag>
+        <tag>计算机网络</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
@@ -1022,8 +1091,8 @@
         <category>网络编程</category>
       </categories>
       <tags>
-        <tag>计算机网络</tag>
         <tag>Java</tag>
+        <tag>计算机网络</tag>
         <tag>NIO</tag>
       </tags>
   </entry>
