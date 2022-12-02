@@ -331,7 +331,7 @@
 <li>DockerCompose的详细语法参考官网：<a href="https://docs.docker.com/compose/compose-file" target="_blank" rel="noopener"></a></li>
 </ul>
 <p><strong>总结：DockerCompose能够帮助我们快速部署分布式应用，无需一个个服务去构建镜像和部署。</strong></p>
-<h3 id="案例：利用DockerCompose部署微服务"><a href="#案例：利用DockerCompose部署微服务" class="headerlink" title="案例：利用DockerCompose部署微服务"></a>案例：利用DockerCompose部署微服务</h3><h4 id="环境整理"><a href="#环境整理" class="headerlink" title="环境整理"></a>环境整理</h4><ul>
+<h2 id="案例：利用DockerCompose部署微服务"><a href="#案例：利用DockerCompose部署微服务" class="headerlink" title="案例：利用DockerCompose部署微服务"></a>案例：利用DockerCompose部署微服务</h2><h3 id="环境整理"><a href="#环境整理" class="headerlink" title="环境整理"></a>环境整理</h3><ul>
 <li>整理目录：</li>
 </ul>
 <p><img src="/2022/12/02/Docker%E5%9F%BA%E7%A1%80/dockercompose目录.png" alt></p>
@@ -349,7 +349,7 @@
 <li>另外：不建议用docker部署数据库</li>
 </ul>
 </blockquote>
-<h4 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h4><ol>
+<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
 <li>Maven打包成app.jar<ul>
 <li>打包时发现问题：多模块引用，找不到模块jar。<ul>
 <li>原因：因为maven会第一时间去本地和配置文件中查询，但是这两个地方都没有模块jar，只要先把父工程install就行了。</li>
